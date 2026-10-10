@@ -202,6 +202,60 @@
     }
     .quiet-button:hover { color: var(--ink); }
 
+    .level-two-layout { grid-template-columns: minmax(0, 1.5fr) minmax(245px, .65fr); }
+    .passage-panel { min-width: 0; padding: 23px; border: 1px solid var(--line); background: var(--white); }
+    .passage-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+    .passage-heading h2 { margin: 7px 0 0; font-family: var(--serif); font-size: 25px; font-weight: 500; }
+    .passage-source { margin: 5px 0 0; color: var(--muted); font-size: 11px; }
+    .passage-paper {
+      margin-top: 19px;
+      padding: 20px 21px;
+      border-left: 2px solid var(--coral);
+      background-color: #f8f5ec;
+      background-image: repeating-linear-gradient(to bottom, transparent 0, transparent 35px, #e8e4da 35px, #e8e4da 36px);
+      color: var(--ink);
+      font-family: var(--serif);
+      font-size: 16px;
+      line-height: 36px;
+    }
+    .word-token {
+      display: inline;
+      padding: 2px 1px;
+      border: 0;
+      border-bottom: 1px solid transparent;
+      background: transparent;
+      color: inherit;
+      cursor: pointer;
+      font: inherit;
+      line-height: inherit;
+      touch-action: none;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .word-token:hover, .word-token:focus-visible { border-bottom-color: var(--green); background: #e8eccf; outline: none; }
+    .word-token.is-removed { color: #96978b; opacity: .65; text-decoration: line-through; text-decoration-color: var(--coral); text-decoration-thickness: 1.5px; }
+    .word-token.is-removed:hover, .word-token.is-removed:focus-visible { color: #596c64; opacity: 1; }
+    .word-token.is-dragging { opacity: .32; }
+    .word-token.drop-target { border-bottom-color: var(--coral); background: #f8dfd5; }
+    .passage-controls { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 13px; }
+    .passage-help { margin: 0; color: var(--muted); font-size: 10px; line-height: 1.6; }
+    .passage-help kbd { padding: 1px 4px; border: 1px solid var(--line); background: var(--paper); font-family: var(--mono); font-size: 9px; }
+    .passage-sidebar { display: flex; flex-direction: column; padding: 19px; background: var(--green); color: var(--white); }
+    .passage-sidebar .label { color: #c0cfc6; }
+    .passage-count { display: flex; align-items: baseline; gap: 6px; margin-top: 15px; font-size: 11px; }
+    .passage-count strong { color: var(--lime); font-family: var(--serif); font-size: 44px; font-weight: 500; line-height: 1; }
+    .passage-target { margin: 6px 0 0; color: #d6dfd9; font-size: 11px; }
+    .passage-progress { height: 3px; margin-top: 15px; background: rgb(255 255 255 / 20%); }
+    .passage-progress span { display: block; width: 0; height: 100%; background: var(--lime); transition: width 180ms ease; }
+    .passage-status { min-height: 42px; margin: 14px 0 0; color: #e5ebe6; font-size: 11px; line-height: 1.6; }
+    .passage-sidebar .finish-button { margin-top: auto; }
+    .passage-sidebar .finish-button:disabled { background: #48675e; color: #b8c4bd; }
+    .passage-sidebar .finish-button:not(:disabled):hover { background: #316b57; }
+    .passage-sidebar .quiet-button { align-self: flex-start; margin: 7px 0 0; color: #d0ddd4; text-decoration-color: #799389; }
+    .passage-sidebar .quiet-button:hover { color: white; }
+    .passage-credit { margin: 14px 0 0; color: #afc2b7; font-family: var(--mono); font-size: 9px; line-height: 1.6; }
+    .level-two-layout[hidden], .game-layout[hidden] { display: none; }
+
     .story-panel { display: flex; flex-direction: column; padding: 19px; background: #e9e5da; }
     .story-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
     .word-count { display: flex; align-items: baseline; gap: 4px; color: var(--muted); font-size: 9px; }
@@ -223,18 +277,24 @@
     }
     .story-placeholder { color: #9a9f93; font-family: var(--serif); font-size: 13px; font-style: italic; }
     .story-word {
-      margin: 0 4px 0 0;
+      margin: 0 1px;
       padding: 1px 1px 2px;
       border: 0;
       border-bottom: 1px solid transparent;
       background: transparent;
       color: var(--ink);
-      cursor: pointer;
+      cursor: grab;
       font-family: var(--serif);
       font-size: 14px;
       line-height: inherit;
+      touch-action: none;
+      user-select: none;
+      -webkit-user-select: none;
     }
     .story-word:hover { border-bottom-color: var(--coral); color: #a54d3d; }
+    .story-word.is-active { background: var(--lime); color: var(--ink); }
+    .story-word.is-dragging { opacity: .32; }
+    .story-word.drop-target { border-bottom-color: var(--coral); background: #f8dfd5; }
     .story-word:focus-visible { outline: 2px solid var(--coral); outline-offset: 1px; }
     .story-footer { display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: center; padding-top: 15px; }
     .story-status { margin: 0; color: var(--muted); font-size: 10px; line-height: 1.5; }
@@ -288,6 +348,10 @@
       .falling-word { width: 30%; min-height: 43px; font-size: 13px; }
       .story-panel { min-height: 380px; padding: 16px; }
       .story-paper { min-height: 205px; }
+      .level-two-layout { grid-template-columns: 1fr; }
+      .passage-panel { padding: 16px; }
+      .passage-paper { padding: 16px 14px; font-size: 15px; }
+      .passage-sidebar { min-height: 270px; }
     }
     @media (max-width: 380px) {
       .page { width: calc(100% - 24px); }
@@ -297,6 +361,8 @@
       .board { height: 340px; }
       .story-footer { grid-template-columns: 1fr; }
       .finish-button { width: 100%; }
+      .passage-heading h2 { font-size: 21px; }
+      .passage-controls { align-items: flex-start; }
     }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
@@ -314,17 +380,17 @@
     </header>
 
     <main class="main">
-      <div class="eyebrow">Три уровня · уровень первый</div>
+      <div class="eyebrow" id="page-eyebrow">Три уровня · уровень первый</div>
       <h1>33 слова</h1>
-      <p class="subtitle">Лови слова на лету. Из выбранных собери историю ровно из 33 слов.</p>
+      <p class="subtitle" id="page-subtitle">Лови слова на лету. Из выбранных собери историю ровно из 33 слов.</p>
 
       <nav class="levels" aria-label="Уровни игры">
-        <div class="level active" aria-current="step"><span class="level-number">01</span><span>Рассказ</span></div>
-        <div class="level soon" aria-label="Уровень 2, скоро"><span class="level-number">02</span><span>Уровень 2</span><span class="level-tag">скоро</span></div>
+        <button class="level active" id="level-one-button" type="button" aria-current="step"><span class="level-number">01</span><span>Рассказ</span></button>
+        <button class="level" id="level-two-button" type="button"><span class="level-number">02</span><span>Сокращение</span></button>
         <div class="level soon" aria-label="Уровень 3, скоро"><span class="level-number">03</span><span>Уровень 3</span><span class="level-tag">скоро</span></div>
       </nav>
 
-      <section class="game-layout" aria-label="Первый уровень: составление рассказа">
+      <section class="game-layout" id="level-one" aria-label="Первый уровень: составление рассказа">
         <div class="play-panel">
           <div class="panel-heading">
             <span class="label">Поле слов</span>
@@ -346,13 +412,39 @@
             <span class="word-count" id="word-count" aria-live="polite"><strong>0</strong> / 33 слов</span>
           </div>
           <div class="progress-track" role="progressbar" aria-label="Количество слов в рассказе" aria-valuemin="0" aria-valuemax="33" aria-valuenow="0" id="progress-track"><span id="progress-fill"></span></div>
-          <p class="story-note">Нажми на слово, чтобы убрать его</p>
+          <p class="story-note">Перетаскивай слова · выбери пару · используй ← →</p>
           <div class="story-paper" id="story-paper" aria-label="Составленный рассказ" aria-live="polite"><span class="story-placeholder">Здесь начнётся твоя история…</span></div>
           <div class="story-footer">
-            <p class="story-status" id="story-status">Пока не исчезли, успей выбрать нужные слова.</p>
+            <p class="story-status" id="story-status">Выбор необратим. Порядок слов можно изменить.</p>
             <button class="finish-button" id="finish-button" type="button" disabled>Закончить рассказ</button>
           </div>
         </div>
+      </section>
+      <section class="game-layout level-two-layout" id="level-two" aria-label="Второй уровень: сокращение отрывка до 33 слов" hidden>
+        <div class="passage-panel">
+          <div class="passage-heading">
+            <div>
+              <span class="label">Отрывок классика</span>
+              <h2>«Метель»</h2>
+              <p class="passage-source">Александр Пушкин · 1831</p>
+            </div>
+            <span class="label">100 слов</span>
+          </div>
+          <div class="passage-paper" id="passage-editor" aria-label="Отрывок. Нажмите на слово, чтобы исключить его, или перетащите, чтобы изменить порядок." aria-live="polite"></div>
+          <div class="passage-controls">
+            <p class="passage-help">Нажми слово, чтобы вычеркнуть. Перетаскивай для перестановки или нажми <kbd>←</kbd> <kbd>→</kbd>.</p>
+          </div>
+        </div>
+        <aside class="passage-sidebar">
+          <span class="label">Сократи отрывок</span>
+          <div class="passage-count"><strong id="passage-count">100</strong><span>слов осталось</span></div>
+          <p class="passage-target">В рассказе должно быть ровно 33</p>
+          <div class="passage-progress" id="passage-progress" role="progressbar" aria-label="Сколько лишних слов убрано" aria-valuemin="0" aria-valuemax="67" aria-valuenow="0"><span id="passage-progress-fill"></span></div>
+          <p class="passage-status" id="passage-status" aria-live="polite">Убери 67 слов. Оставшиеся можно переставить.</p>
+          <button class="finish-button" id="passage-finish" type="button" disabled>Завершить сокращение</button>
+          <button class="quiet-button" id="passage-reset" type="button">Вернуть исходный отрывок</button>
+          <p class="passage-credit">Александр Пушкин, «Метель». Отрывок в общественном достоянии.</p>
+        </aside>
       </section>
       <div class="footer-note"><span>Одна история · 33 слова</span><span>Слова исчезают — твой шанс нет</span></div>
     </main>
@@ -368,6 +460,16 @@
     </section>
   </div>
 
+  <div class="modal-backdrop" id="passage-modal" hidden>
+    <section class="modal" role="dialog" aria-modal="true" aria-labelledby="passage-modal-title">
+      <span class="modal-kicker">уровень второй · завершён</span>
+      <h2 id="passage-modal-title">Смысл остался.</h2>
+      <p>Ровно 33 слова из пушкинской «Метели». Ты не только сократил отрывок, но и выбрал его новый ритм.</p>
+      <p class="modal-story" id="passage-result"></p>
+      <button class="finish-button" id="passage-play-again" type="button">Попробовать ещё раз</button>
+    </section>
+  </div>
+
   <script>
     (() => {
       const words = [
@@ -377,7 +479,14 @@
         "маленький", "странный", "старый", "золотой", "невидимый", "последний", "чужой", "пустой", "тёплый", "огромный",
         "ключ", "конверт", "самолёт", "фонарь", "секрет", "пирог", "компас", "зонтик", "чемодан", "телефон",
         "поскольку", "хотя", "поэтому", "вместе", "совсем", "всё-таки", "никогда", "теперь", "впереди", "внутри",
-        "заговорил.", "улыбнулся.", "исчезло.", "сверкнуло.", "получилось.", "изменилось.", "запомнилось.", "продолжилось.", "приснилось.", "началось."
+        "заговорил.", "улыбнулся.", "исчезло.", "сверкнуло.", "получилось.", "изменилось.", "запомнилось.", "продолжилось.", "приснилось.", "началось.",
+        "кринж", "вайб", "зашквар", "имба", "рофл", "краш", "токсик", "чиллить", "флексить", "хайп",
+        "жиза", "угар", "топчик", "мем", "чел", "чекнул", "залетел", "залип", "вписался", "подкатил",
+        "слетел", "зашёл", "отвалился", "зафорсил", "запостил", "заценил", "изи", "лол", "кек", "окей",
+        "кринжовый", "вайбовый", "мемный", "легендарный", "рандомный", "тильт", "флекс", "пруф", "база", "пушка",
+        "я", "ты", "он", "она", "мы", "они", "мне", "тебе", "ему", "ей",
+        "мой", "наш", "этот", "тот", "не", "но", "и", "а", "или", "когда",
+        "пока", "если", "после", "снова", "внезапно", "наконец", "неловко", "безумно", "тайно", "капец"
       ];
       const board = document.querySelector("#board");
       const boardEmpty = document.querySelector("#board-empty");
@@ -390,14 +499,38 @@
       const modal = document.querySelector("#finish-modal");
       const finalStory = document.querySelector("#final-story");
       const modalClose = document.querySelector("#modal-close");
+      const firstLevelView = document.querySelector("#level-one");
+      const secondLevelView = document.querySelector("#level-two");
+      const firstLevelButton = document.querySelector("#level-one-button");
+      const secondLevelButton = document.querySelector("#level-two-button");
+      const pageEyebrow = document.querySelector("#page-eyebrow");
+      const pageSubtitle = document.querySelector("#page-subtitle");
+      const passageEditor = document.querySelector("#passage-editor");
+      const passageCount = document.querySelector("#passage-count");
+      const passageProgress = document.querySelector("#passage-progress");
+      const passageProgressFill = document.querySelector("#passage-progress-fill");
+      const passageStatus = document.querySelector("#passage-status");
+      const passageFinish = document.querySelector("#passage-finish");
+      const passageModal = document.querySelector("#passage-modal");
+      const passageResult = document.querySelector("#passage-result");
+      const passageExcerpt = "В конце 1811 года, в эпоху нам достопамятную, жил в своем поместье Ненарадове добрый Гаврила Гаврилович Р**. Он славился во всей округе гостеприимством и радушием; соседи поминутно ездили к нему поесть, попить, поиграть по пяти копеек в бостон с его женою, а некоторые для того, чтоб поглядеть на дочку их, Марью Гавриловну, стройную, бледную и семнадцатилетнюю девицу. Она считалась богатой невестою, и многие прочили ее за себя или за сыновей. Марья Гавриловна была воспитана на французских романах, и следственно была влюблена. Предмет, избранный ею, был бедный армейский прапорщик, находившийся в отпуску в своей деревне. Само по себе разумеется, что молодой…";
+      const originalPassageWords = passageExcerpt.match(/\S+/gu);
       const lifetime = 8000;
       let selected = [];
       let falling = [];
+      let passageWords = originalPassageWords.map((text) => ({ text, removed: false }));
+      let wordDeck = [];
       let nextId = 0;
-      let lastWord = "";
       let spawnTimer;
       let frameTimer;
       let finished = false;
+      let activeLevel = 1;
+      let firstLevelPausedAt = null;
+      let activeStoryIndex = null;
+      let storyDrag = null;
+      let ignoreStoryClick = false;
+      let pointerDrag = null;
+      let ignoreTokenClick = false;
 
       function wordForm(count) {
         const lastTwo = count % 100;
@@ -407,7 +540,78 @@
         return "слов";
       }
 
-      function renderStory() {
+      function renderPassage() {
+        passageEditor.replaceChildren();
+        passageWords.forEach((word, index) => {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = `word-token${word.removed ? " is-removed" : ""}`;
+          button.textContent = word.text;
+          button.dataset.index = String(index);
+          button.setAttribute("aria-pressed", String(word.removed));
+          button.setAttribute("aria-label", `${word.removed ? "Вернуть" : "Исключить"} слово «${word.text}», позиция ${index + 1}`);
+          passageEditor.append(button);
+          if (index < passageWords.length - 1) passageEditor.append(document.createTextNode(" "));
+        });
+        updatePassageCount();
+      }
+
+      function updatePassageCount() {
+        const remaining = passageWords.filter((word) => !word.removed).length;
+        const removed = originalPassageWords.length - remaining;
+        passageCount.textContent = String(remaining);
+        passageProgress.setAttribute("aria-valuenow", String(removed));
+        passageProgressFill.style.width = `${(removed / 67) * 100}%`;
+        passageFinish.disabled = remaining !== 33;
+        passageStatus.textContent = remaining === 33
+          ? "Ровно 33 слова. Можно менять их порядок и завершать."
+          : remaining > 33
+            ? `Убери ещё ${remaining - 33} ${wordForm(remaining - 33)}.`
+            : `Верни ${33 - remaining} ${wordForm(33 - remaining)}, чтобы получилось ровно 33.`;
+      }
+
+      function resetPassage() {
+        passageWords = originalPassageWords.map((text) => ({ text, removed: false }));
+        passageModal.hidden = true;
+        renderPassage();
+      }
+
+      function switchLevel(level) {
+        if (level === activeLevel) return;
+        const isFirstLevel = level === 1;
+        if (isFirstLevel) {
+          const pausedFor = performance.now() - firstLevelPausedAt;
+          falling.forEach((word) => { word.born += pausedFor; });
+          firstLevelView.hidden = false;
+          secondLevelView.hidden = true;
+          pageEyebrow.textContent = "Три уровня · уровень первый";
+          pageSubtitle.textContent = "Лови слова на лету. Из выбранных собери историю ровно из 33 слов.";
+          renderBoard(performance.now());
+          startFirstLevelTimers();
+          firstLevelPausedAt = null;
+        } else {
+          clearInterval(spawnTimer);
+          clearInterval(frameTimer);
+          firstLevelPausedAt = performance.now();
+          firstLevelView.hidden = true;
+          secondLevelView.hidden = false;
+          pageEyebrow.textContent = "Три уровня · уровень второй";
+          pageSubtitle.textContent = "Сократи отрывок классика до 33 слов. Сохрани смысл и найди свой порядок.";
+          renderPassage();
+        }
+        activeLevel = level;
+        firstLevelButton.classList.toggle("active", isFirstLevel);
+        secondLevelButton.classList.toggle("active", !isFirstLevel);
+        if (isFirstLevel) {
+          firstLevelButton.setAttribute("aria-current", "step");
+          secondLevelButton.removeAttribute("aria-current");
+        } else {
+          secondLevelButton.setAttribute("aria-current", "step");
+          firstLevelButton.removeAttribute("aria-current");
+        }
+      }
+
+      function renderStory(focusIndex = null) {
         storyPaper.replaceChildren();
         if (selected.length === 0) {
           const placeholder = document.createElement("span");
@@ -417,14 +621,17 @@
         } else {
           selected.forEach((word, index) => {
             const button = document.createElement("button");
-            button.className = "story-word";
+            button.className = `story-word${index === activeStoryIndex ? " is-active" : ""}`;
             button.type = "button";
             button.textContent = word;
-            button.setAttribute("aria-label", `Убрать слово «${word}» из рассказа`);
+            button.setAttribute("aria-label", `Слово «${word}», позиция ${index + 1} из ${selected.length}. Используй стрелки, чтобы переставить`);
+            button.setAttribute("aria-pressed", String(index === activeStoryIndex));
             button.dataset.index = String(index);
             storyPaper.append(button);
+            if (index < selected.length - 1) storyPaper.append(document.createTextNode(" "));
           });
         }
+        if (focusIndex !== null) storyPaper.querySelector(`[data-index="${focusIndex}"]`)?.focus();
         const count = selected.length;
         wordCount.querySelector("strong").textContent = String(count);
         wordCount.classList.toggle("complete", count === 33);
@@ -433,10 +640,12 @@
         progressFill.classList.toggle("complete", count === 33);
         finishButton.disabled = count !== 33 || finished;
         storyStatus.textContent = count === 33
-          ? "Тридцать три. Твоя история готова." 
+          ? "Тридцать три слова. Перетаскивай или выбери пару, чтобы изменить порядок."
+          : wordDeck.length === 0
+            ? "Новых слов не будет. Выбирай оставшиеся или начни заново."
           : count > 0
-            ? `Ещё ${33 - count} ${wordForm(33 - count)} — и рассказ сложится.`
-            : "Пока не исчезли, успей выбрать нужные слова.";
+            ? `Ещё ${33 - count} ${wordForm(33 - count)}. Выбор нельзя отменить; порядок можно менять.`
+            : "Выбор необратим. Порядок меняется перетаскиванием или стрелками.";
       }
 
       function chooseWord(id) {
@@ -445,14 +654,20 @@
         if (index === -1) return;
         const [word] = falling.splice(index, 1);
         selected.push(word.text);
+        activeStoryIndex = null;
         renderStory();
         renderBoard(performance.now());
       }
 
       function spawnWord(now = performance.now()) {
-        let text = words[Math.floor(Math.random() * words.length)];
-        if (text === lastWord) text = words[(words.indexOf(text) + 1) % words.length];
-        lastWord = text;
+        if (wordDeck.length === 0) {
+          clearInterval(spawnTimer);
+          boardEmpty.textContent = "Все слова этой партии показаны.";
+          boardEmpty.hidden = falling.length > 0;
+          storyStatus.textContent = "Новых слов не будет. Выбирай оставшиеся или начни заново.";
+          return;
+        }
+        const text = wordDeck.pop();
         const mobile = window.matchMedia("(max-width: 760px)").matches;
         const lanes = mobile ? 3 : 6;
         const lane = Math.floor(Math.random() * lanes);
@@ -488,21 +703,108 @@
         boardEmpty.hidden = falling.length > 0;
       }
 
+      function startFirstLevelTimers() {
+        clearInterval(spawnTimer);
+        clearInterval(frameTimer);
+        spawnTimer = setInterval(() => spawnWord(), 1450);
+        frameTimer = setInterval(() => renderBoard(performance.now()), 100);
+      }
+
+      function shuffleWordDeck() {
+        wordDeck = [...words];
+        for (let index = wordDeck.length - 1; index > 0; index--) {
+          const swapIndex = Math.floor(Math.random() * (index + 1));
+          [wordDeck[index], wordDeck[swapIndex]] = [wordDeck[swapIndex], wordDeck[index]];
+        }
+      }
+
       function restart() {
         clearInterval(spawnTimer);
         clearInterval(frameTimer);
         falling = [];
         selected = [];
+        activeStoryIndex = null;
         finished = false;
+        firstLevelPausedAt = null;
         modal.hidden = true;
         board.querySelectorAll(".falling-word").forEach((node) => node.remove());
+        boardEmpty.textContent = "Ждём первое слово…";
         boardEmpty.hidden = false;
+        shuffleWordDeck();
         renderStory();
         spawnWord();
         renderBoard(performance.now());
-        spawnTimer = setInterval(() => spawnWord(), 1450);
-        frameTimer = setInterval(() => renderBoard(performance.now()), 100);
+        startFirstLevelTimers();
       }
+
+      passageEditor.addEventListener("click", (event) => {
+        const button = event.target.closest(".word-token");
+        if (!button || ignoreTokenClick) return;
+        const word = passageWords[Number(button.dataset.index)];
+        word.removed = !word.removed;
+        renderPassage();
+        passageEditor.querySelector(`[data-index="${button.dataset.index}"]`)?.focus();
+      });
+
+      passageEditor.addEventListener("keydown", (event) => {
+        const button = event.target.closest(".word-token");
+        if (!button || (event.key !== "ArrowLeft" && event.key !== "ArrowRight")) return;
+        const from = Number(button.dataset.index);
+        const to = from + (event.key === "ArrowLeft" ? -1 : 1);
+        if (to < 0 || to >= passageWords.length) return;
+        event.preventDefault();
+        [passageWords[from], passageWords[to]] = [passageWords[to], passageWords[from]];
+        renderPassage();
+        passageEditor.querySelector(`[data-index="${to}"]`)?.focus();
+      });
+
+      passageEditor.addEventListener("pointerdown", (event) => {
+        const button = event.target.closest(".word-token");
+        if (!button || event.button !== 0) return;
+        pointerDrag = {
+          pointerId: event.pointerId,
+          from: Number(button.dataset.index),
+          startX: event.clientX,
+          startY: event.clientY,
+          started: false
+        };
+      });
+
+      document.addEventListener("pointermove", (event) => {
+        if (!pointerDrag || event.pointerId !== pointerDrag.pointerId) return;
+        if (!pointerDrag.started && Math.hypot(event.clientX - pointerDrag.startX, event.clientY - pointerDrag.startY) > 6) {
+          pointerDrag.started = true;
+          passageEditor.querySelector(`[data-index="${pointerDrag.from}"]`)?.classList.add("is-dragging");
+        }
+        if (!pointerDrag.started) return;
+        event.preventDefault();
+        passageEditor.querySelectorAll(".drop-target").forEach((token) => token.classList.remove("drop-target"));
+        const target = document.elementFromPoint(event.clientX, event.clientY)?.closest(".word-token");
+        target?.classList.add("drop-target");
+      });
+
+      document.addEventListener("pointerup", (event) => {
+        if (!pointerDrag || event.pointerId !== pointerDrag.pointerId) return;
+        const drag = pointerDrag;
+        pointerDrag = null;
+        if (!drag.started) return;
+        const target = document.elementFromPoint(event.clientX, event.clientY)?.closest(".word-token");
+        const to = target ? Number(target.dataset.index) : -1;
+        if (to >= 0 && to !== drag.from) {
+          [passageWords[drag.from], passageWords[to]] = [passageWords[to], passageWords[drag.from]];
+          renderPassage();
+          passageEditor.querySelector(`[data-index="${to}"]`)?.focus();
+        } else {
+          passageEditor.querySelectorAll(".is-dragging, .drop-target").forEach((token) => token.classList.remove("is-dragging", "drop-target"));
+        }
+        ignoreTokenClick = true;
+        setTimeout(() => { ignoreTokenClick = false; }, 0);
+      });
+
+      document.addEventListener("pointercancel", () => {
+        pointerDrag = null;
+        passageEditor.querySelectorAll(".is-dragging, .drop-target").forEach((token) => token.classList.remove("is-dragging", "drop-target"));
+      });
 
       board.addEventListener("click", (event) => {
         const button = event.target.closest(".falling-word");
@@ -511,9 +813,78 @@
 
       storyPaper.addEventListener("click", (event) => {
         const button = event.target.closest(".story-word");
-        if (!button || finished) return;
-        selected.splice(Number(button.dataset.index), 1);
-        renderStory();
+        if (!button || finished || ignoreStoryClick) return;
+        const index = Number(button.dataset.index);
+        if (activeStoryIndex === null) {
+          activeStoryIndex = index;
+          renderStory(index);
+        } else if (activeStoryIndex === index) {
+          activeStoryIndex = null;
+          renderStory(index);
+        } else {
+          [selected[activeStoryIndex], selected[index]] = [selected[index], selected[activeStoryIndex]];
+          activeStoryIndex = null;
+          renderStory(index);
+        }
+      });
+
+      storyPaper.addEventListener("keydown", (event) => {
+        const button = event.target.closest(".story-word");
+        if (!button || finished || (event.key !== "ArrowLeft" && event.key !== "ArrowRight")) return;
+        const from = Number(button.dataset.index);
+        const to = from + (event.key === "ArrowLeft" ? -1 : 1);
+        if (to < 0 || to >= selected.length) return;
+        event.preventDefault();
+        [selected[from], selected[to]] = [selected[to], selected[from]];
+        activeStoryIndex = null;
+        renderStory(to);
+      });
+
+      storyPaper.addEventListener("pointerdown", (event) => {
+        const button = event.target.closest(".story-word");
+        if (!button || finished || event.button !== 0) return;
+        storyDrag = {
+          pointerId: event.pointerId,
+          from: Number(button.dataset.index),
+          startX: event.clientX,
+          startY: event.clientY,
+          started: false
+        };
+      });
+
+      document.addEventListener("pointermove", (event) => {
+        if (!storyDrag || event.pointerId !== storyDrag.pointerId) return;
+        if (!storyDrag.started && Math.hypot(event.clientX - storyDrag.startX, event.clientY - storyDrag.startY) > 6) {
+          storyDrag.started = true;
+          storyPaper.querySelector(`[data-index="${storyDrag.from}"]`)?.classList.add("is-dragging");
+        }
+        if (!storyDrag.started) return;
+        event.preventDefault();
+        storyPaper.querySelectorAll(".drop-target").forEach((token) => token.classList.remove("drop-target"));
+        document.elementFromPoint(event.clientX, event.clientY)?.closest(".story-word")?.classList.add("drop-target");
+      });
+
+      document.addEventListener("pointerup", (event) => {
+        if (!storyDrag || event.pointerId !== storyDrag.pointerId) return;
+        const drag = storyDrag;
+        storyDrag = null;
+        if (!drag.started) return;
+        const target = document.elementFromPoint(event.clientX, event.clientY)?.closest(".story-word");
+        const to = target ? Number(target.dataset.index) : -1;
+        if (to >= 0 && to !== drag.from) {
+          [selected[drag.from], selected[to]] = [selected[to], selected[drag.from]];
+          activeStoryIndex = null;
+          renderStory(to);
+        } else {
+          storyPaper.querySelectorAll(".is-dragging, .drop-target").forEach((token) => token.classList.remove("is-dragging", "drop-target"));
+        }
+        ignoreStoryClick = true;
+        setTimeout(() => { ignoreStoryClick = false; }, 0);
+      });
+
+      document.addEventListener("pointercancel", () => {
+        storyDrag = null;
+        storyPaper.querySelectorAll(".is-dragging, .drop-target").forEach((token) => token.classList.remove("is-dragging", "drop-target"));
       });
 
       document.addEventListener("keydown", (event) => {
@@ -523,9 +894,23 @@
           if (button) chooseWord(Number(button.dataset.id));
         }
         if (event.key === "Escape" && !modal.hidden) modal.hidden = true;
+        if (event.key === "Escape" && !passageModal.hidden) passageModal.hidden = true;
       });
 
+      firstLevelButton.addEventListener("click", () => switchLevel(1));
+      secondLevelButton.addEventListener("click", () => switchLevel(2));
       document.querySelector("#restart-button").addEventListener("click", restart);
+      document.querySelector("#passage-reset").addEventListener("click", resetPassage);
+      passageFinish.addEventListener("click", () => {
+        if (passageWords.filter((word) => !word.removed).length !== 33) return;
+        passageResult.textContent = passageWords.filter((word) => !word.removed).map((word) => word.text).join(" ");
+        passageModal.hidden = false;
+        document.querySelector("#passage-play-again").focus();
+      });
+      document.querySelector("#passage-play-again").addEventListener("click", resetPassage);
+      passageModal.addEventListener("click", (event) => {
+        if (event.target === passageModal) passageModal.hidden = true;
+      });
       finishButton.addEventListener("click", () => {
         if (selected.length !== 33) return;
         finished = true;
@@ -543,6 +928,8 @@
         if (event.target === modal) modal.hidden = true;
       });
       window.addEventListener("resize", () => renderBoard(performance.now()));
+      if (originalPassageWords.length !== 100) throw new Error(`Expected 100 source words, received ${originalPassageWords.length}`);
+      renderPassage();
       restart();
     })();
   </script>
