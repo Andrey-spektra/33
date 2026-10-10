@@ -258,9 +258,11 @@
 
     .story-panel { display: flex; flex-direction: column; padding: 19px; background: #e9e5da; }
     .story-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+    .story-counts { display: flex; align-items: center; gap: 12px; }
     .word-count { display: flex; align-items: baseline; gap: 4px; color: var(--muted); font-size: 9px; }
     .word-count strong { color: var(--ink); font-family: var(--sans); font-size: 16px; font-weight: 700; }
     .word-count.complete strong { color: #25806a; }
+    .fragment-count { color: var(--muted); font-family: var(--mono); font-size: 9px; white-space: nowrap; }
     .progress-track { height: 3px; margin-top: 12px; background: #d4d2c7; }
     .progress-track span { display: block; width: 0; height: 100%; background: var(--coral); transition: width 220ms ease, background-color 220ms ease; }
     .progress-track span.complete { background: #468a67; }
@@ -268,16 +270,17 @@
     .story-paper {
       flex: 1;
       min-height: 250px;
-      align-content: flex-start;
       padding: 16px 12px;
       border-left: 1px solid #e3a08e;
       background-color: #f8f5ec;
       background-image: repeating-linear-gradient(to bottom, transparent 0, transparent 30px, #e8e4da 30px, #e8e4da 31px);
-      line-height: 31px;
+      line-height: 30px;
     }
+    .story-words { min-height: 31px; line-height: 30px; }
     .story-placeholder { color: #9a9f93; font-family: var(--serif); font-size: 13px; font-style: italic; }
     .story-word {
-      margin: 0 1px;
+      display: inline-block;
+      margin: 0 3px 4px 0;
       padding: 1px 1px 2px;
       border: 0;
       border-bottom: 1px solid transparent;
@@ -295,7 +298,28 @@
     .story-word.is-active { background: var(--lime); color: var(--ink); }
     .story-word.is-dragging { opacity: .32; }
     .story-word.drop-target { border-bottom-color: var(--coral); background: #f8dfd5; }
+    .story-word.drop-before { box-shadow: -2px 0 var(--coral); }
+    .story-word.drop-after { box-shadow: 2px 0 var(--coral); }
     .story-word:focus-visible { outline: 2px solid var(--coral); outline-offset: 1px; }
+    .story-write-in {
+      display: block;
+      width: 100%;
+      min-height: 93px;
+      margin-top: 5px;
+      padding: 5px 2px;
+      resize: vertical;
+      border: 0;
+      border-top: 1px dashed #d7c9b9;
+      border-radius: 0;
+      outline: none;
+      background: transparent;
+      color: var(--ink);
+      font-family: var(--serif);
+      font-size: 14px;
+      line-height: 30px;
+    }
+    .story-write-in::placeholder { color: #9a9f93; font-style: italic; opacity: 1; }
+    .story-write-in:focus-visible { border-top-color: var(--coral); }
     .story-footer { display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: center; padding-top: 15px; }
     .story-status { margin: 0; color: var(--muted); font-size: 10px; line-height: 1.5; }
     .finish-button {
@@ -401,7 +425,7 @@
             <div class="board-caption" aria-hidden="true">поймай своё слово</div>
           </div>
           <div class="board-actions">
-            <p class="hint">Выбрать слово: <kbd>клик</kbd> или <kbd>1–6</kbd></p>
+            <p class="hint">Лови слова и фразы: <kbd>клик</kbd> или <kbd>1–6</kbd></p>
             <button class="quiet-button" id="restart-button" type="button">Начать заново</button>
           </div>
         </div>
@@ -409,11 +433,17 @@
         <div class="story-panel">
           <div class="story-top">
             <span class="label">Твой рассказ</span>
-            <span class="word-count" id="word-count" aria-live="polite"><strong>0</strong> / 33 слов</span>
+            <span class="story-counts">
+              <span class="word-count" id="word-count" aria-live="polite"><strong>0</strong> / 33 слов</span>
+              <span class="fragment-count" id="fragment-count">0 / 25 фрагментов</span>
+            </span>
           </div>
           <div class="progress-track" role="progressbar" aria-label="Количество слов в рассказе" aria-valuemin="0" aria-valuemax="33" aria-valuenow="0" id="progress-track"><span id="progress-fill"></span></div>
-          <p class="story-note">Перетаскивай слова · выбери пару · используй ← →</p>
-          <div class="story-paper" id="story-paper" aria-label="Составленный рассказ" aria-live="polite"><span class="story-placeholder">Здесь начнётся твоя история…</span></div>
+          <p class="story-note">Поймай до 25 фрагментов. Перетаскивай их и допиши рассказ</p>
+          <div class="story-paper" id="story-paper" aria-label="Составленный рассказ">
+            <div class="story-words" id="story-words" aria-live="polite"><span class="story-placeholder">Здесь начнётся твоя история…</span></div>
+            <textarea class="story-write-in" id="story-write-in" aria-label="Допиши рассказ своими словами" placeholder="Допиши историю своими словами…" spellcheck="true"></textarea>
+          </div>
           <div class="story-footer">
             <p class="story-status" id="story-status">Выбор необратим. Порядок слов можно изменить.</p>
             <button class="finish-button" id="finish-button" type="button" disabled>Закончить рассказ</button>
@@ -473,25 +503,41 @@
   <script>
     (() => {
       const words = [
-        "однажды", "утром", "ночью", "вдруг", "тихо", "зачем-то", "случайно", "бережно", "почти", "сначала",
-        "человек", "кот", "путешественник", "соседка", "почтальон", "море", "город", "сад", "вокзал", "чердак",
-        "нашёл", "услышал", "встретил", "забыл", "придумал", "спросил", "увидел", "потерял", "вернулся", "остался",
-        "маленький", "странный", "старый", "золотой", "невидимый", "последний", "чужой", "пустой", "тёплый", "огромный",
-        "ключ", "конверт", "самолёт", "фонарь", "секрет", "пирог", "компас", "зонтик", "чемодан", "телефон",
-        "поскольку", "хотя", "поэтому", "вместе", "совсем", "всё-таки", "никогда", "теперь", "впереди", "внутри",
-        "заговорил.", "улыбнулся.", "исчезло.", "сверкнуло.", "получилось.", "изменилось.", "запомнилось.", "продолжилось.", "приснилось.", "началось.",
-        "кринж", "вайб", "зашквар", "имба", "рофл", "краш", "токсик", "чиллить", "флексить", "хайп",
-        "жиза", "угар", "топчик", "мем", "чел", "чекнул", "залетел", "залип", "вписался", "подкатил",
-        "слетел", "зашёл", "отвалился", "зафорсил", "запостил", "заценил", "изи", "лол", "кек", "окей",
-        "кринжовый", "вайбовый", "мемный", "легендарный", "рандомный", "тильт", "флекс", "пруф", "база", "пушка",
-        "я", "ты", "он", "она", "мы", "они", "мне", "тебе", "ему", "ей",
-        "мой", "наш", "этот", "тот", "не", "но", "и", "а", "или", "когда",
-        "пока", "если", "после", "снова", "внезапно", "наконец", "неловко", "безумно", "тайно", "капец"
+        "вышел из дома", "вернулся поздно вечером", "побежал за автобусом", "опоздал на поезд", "переехал в город",
+        "забыл выключить свет", "нашёл чужое письмо", "услышал знакомую мелодию", "заметил открытое окно", "встретил старого друга",
+        "поймал первый снег", "спрятал ключ", "позвонил среди ночи", "оставил записку", "принёс домой букет",
+        "свернул в переулок", "дошёл до станции", "решил всё рассказать", "промолчал в ответ", "внезапно рассмеялся",
+        "долго не спал", "медленно открыл дверь", "не ответил", "пошёл искать её", "попробовал начать",
+        "сбежал под дождём", "задержался на крыше", "купил билет", "спросил дорогу", "узнал её голос",
+        "потерял счёт времени", "запомнил этот вечер", "решился на перемены", "притворился спящим", "не сдержал обещание",
+        "разбудил весь подъезд", "поставил чайник", "вышел на лестницу", "увидел свет", "передумал у порога",
+        "бледные руки", "усталые глаза", "мокрые волосы", "тёплый шарф", "чужой почерк", "пустая остановка", "ночной трамвай", "старый двор",
+        "синее пальто", "разбитый телефон", "карманные часы", "бумажный самолётик", "последний фонарь", "забытый зонт", "маленький секрет",
+        "тихий голос", "короткое сообщение", "несказанное слово", "знакомый запах", "пахнущий дождём асфальт", "кухня без света",
+        "свет в окне", "шумный вокзал", "закрытая дверь", "длинный коридор", "чай на двоих", "ключ без замка", "поезд без расписания",
+        "самый обычный вторник", "странное совпадение", "неудачная шутка", "случайная встреча", "важный разговор", "долгая дорога",
+        "запах старых книг", "записка без подписи", "следы на снегу", "эхо в подъезде", "билет в кармане", "письмо без адреса",
+        "всё ещё ждал", "почти поверил", "едва улыбнулся", "долго смотрел вслед", "молча кивнул", "крепко сжал ладонь",
+        "пожал плечами", "отвёл взгляд", "глубоко вдохнул", "не узнал себя", "пожалел о словах", "рассказал правду",
+        "не нашёл ответа", "впервые за годы", "вопреки всему", "как будто случайно", "сам не заметил",
+        "почему-то остался", "снова поверил людям", "вдруг полегчало", "ничего не объяснил", "смеялся до слёз",
+        "а потом передумал", "но стало поздно", "никто не заметил", "хотя очень старался", "пока город спал",
+        "когда стих дождь", "после долгой паузы", "прежде чем уйти", "не стал спрашивать", "зато всё понял",
+        "собрался с силами", "сказал главное", "оставил дверь открытой", "пошёл домой", "написал и стёр",
+        "обернулся на шаги", "поднял воротник", "пересчитал мелочь", "вышел на остановке", "засмеялся невпопад",
+        "придумал другой финал", "сложил письмо", "признался себе", "сказал шёпотом", "не отпускал руку",
+        "разговор не клеился", "планы рассыпались", "время будто замерло", "тишина сказала больше", "дождь начался некстати",
+        "свет погас внезапно", "ключ подошёл", "поезд тронулся", "телефон завибрировал", "кто-то позвал",
+        "будь что будет", "неплохой вечер", "всё пошло наперекосяк", "никто не ожидал", "конец стал началом",
+        "всё вокруг изменилось", "вдруг стало смешно", "кажется, понял", "в тот момент", "ничего необычного"
       ];
       const board = document.querySelector("#board");
       const boardEmpty = document.querySelector("#board-empty");
       const storyPaper = document.querySelector("#story-paper");
+      const storyWords = document.querySelector("#story-words");
+      const storyWriteIn = document.querySelector("#story-write-in");
       const wordCount = document.querySelector("#word-count");
+      const fragmentCount = document.querySelector("#fragment-count");
       const progress = document.querySelector("#progress-track");
       const progressFill = document.querySelector("#progress-fill");
       const storyStatus = document.querySelector("#story-status");
@@ -516,12 +562,14 @@
       const passageExcerpt = "В конце 1811 года, в эпоху нам достопамятную, жил в своем поместье Ненарадове добрый Гаврила Гаврилович Р**. Он славился во всей округе гостеприимством и радушием; соседи поминутно ездили к нему поесть, попить, поиграть по пяти копеек в бостон с его женою, а некоторые для того, чтоб поглядеть на дочку их, Марью Гавриловну, стройную, бледную и семнадцатилетнюю девицу. Она считалась богатой невестою, и многие прочили ее за себя или за сыновей. Марья Гавриловна была воспитана на французских романах, и следственно была влюблена. Предмет, избранный ею, был бедный армейский прапорщик, находившийся в отпуску в своей деревне. Само по себе разумеется, что молодой…";
       const originalPassageWords = passageExcerpt.match(/\S+/gu);
       const lifetime = 8000;
+      const targetWordCount = 33;
+      const maxSelectedFragments = 25;
       let selected = [];
       let falling = [];
       let passageWords = originalPassageWords.map((text) => ({ text, removed: false }));
       let wordDeck = [];
       let nextId = 0;
-      let spawnTimer;
+      let spawnTimer = null;
       let frameTimer;
       let finished = false;
       let activeLevel = 1;
@@ -531,6 +579,18 @@
       let ignoreStoryClick = false;
       let pointerDrag = null;
       let ignoreTokenClick = false;
+
+      function countWords(text) {
+        return text.trim() ? text.trim().split(/\s+/u).length : 0;
+      }
+
+      function selectedWordCount() {
+        return selected.reduce((count, fragment) => count + countWords(fragment), 0);
+      }
+
+      function storyWordCount() {
+        return selectedWordCount() + countWords(storyWriteIn.value);
+      }
 
       function wordForm(count) {
         const lastTwo = count % 100;
@@ -612,59 +672,65 @@
       }
 
       function renderStory(focusIndex = null) {
-        storyPaper.replaceChildren();
-        if (selected.length === 0) {
+        storyWords.replaceChildren();
+        if (selected.length === 0 && countWords(storyWriteIn.value) === 0) {
           const placeholder = document.createElement("span");
           placeholder.className = "story-placeholder";
           placeholder.textContent = "Здесь начнётся твоя история…";
-          storyPaper.append(placeholder);
+          storyWords.append(placeholder);
         } else {
           selected.forEach((word, index) => {
             const button = document.createElement("button");
             button.className = `story-word${index === activeStoryIndex ? " is-active" : ""}`;
             button.type = "button";
             button.textContent = word;
-            button.setAttribute("aria-label", `Слово «${word}», позиция ${index + 1} из ${selected.length}. Используй стрелки, чтобы переставить`);
+            button.setAttribute("aria-label", `Фрагмент «${word}», позиция ${index + 1} из ${selected.length}. Используй стрелки, чтобы переставить`);
             button.setAttribute("aria-pressed", String(index === activeStoryIndex));
             button.dataset.index = String(index);
-            storyPaper.append(button);
-            if (index < selected.length - 1) storyPaper.append(document.createTextNode(" "));
+            storyWords.append(button);
+            if (index < selected.length - 1) storyWords.append(document.createTextNode(" "));
           });
         }
-        if (focusIndex !== null) storyPaper.querySelector(`[data-index="${focusIndex}"]`)?.focus();
-        const count = selected.length;
+        if (focusIndex !== null) storyWords.querySelector(`[data-index="${focusIndex}"]`)?.focus();
+        updateStoryCounts();
+      }
+
+      function updateStoryCounts() {
+        const count = storyWordCount();
         wordCount.querySelector("strong").textContent = String(count);
-        wordCount.classList.toggle("complete", count === 33);
-        progress.setAttribute("aria-valuenow", String(count));
-        progressFill.style.width = `${(count / 33) * 100}%`;
-        progressFill.classList.toggle("complete", count === 33);
-        finishButton.disabled = count !== 33 || finished;
-        storyStatus.textContent = count === 33
-          ? "Тридцать три слова. Перетаскивай или выбери пару, чтобы изменить порядок."
-          : wordDeck.length === 0
-            ? "Новых слов не будет. Выбирай оставшиеся или начни заново."
-          : count > 0
-            ? `Ещё ${33 - count} ${wordForm(33 - count)}. Выбор нельзя отменить; порядок можно менять.`
-            : "Выбор необратим. Порядок меняется перетаскиванием или стрелками.";
+        wordCount.classList.toggle("complete", count === targetWordCount);
+        fragmentCount.textContent = `${selected.length} / ${maxSelectedFragments} фрагментов`;
+        progress.setAttribute("aria-valuenow", String(Math.min(count, targetWordCount)));
+        progressFill.style.width = `${Math.min(count / targetWordCount, 1) * 100}%`;
+        progressFill.classList.toggle("complete", count === targetWordCount);
+        finishButton.disabled = count !== targetWordCount || finished;
+        storyStatus.textContent = count === targetWordCount
+          ? "Ровно 33 слова. Перетаскивай фрагменты, чтобы менять порядок."
+          : count > targetWordCount
+            ? `В рассказе на ${count - targetWordCount} ${wordForm(count - targetWordCount)} больше. Сократи свой текст.`
+            : `Добавь ещё ${targetWordCount - count} ${wordForm(targetWordCount - count)}. Выбрать можно до ${maxSelectedFragments} фрагментов.`;
       }
 
       function chooseWord(id) {
-        if (finished || selected.length >= 33) return;
+        if (finished || selected.length >= maxSelectedFragments || storyWordCount() >= targetWordCount) return;
         const index = falling.findIndex((word) => word.id === id);
         if (index === -1) return;
+        if (storyWordCount() + countWords(falling[index].text) > targetWordCount) return;
         const [word] = falling.splice(index, 1);
         selected.push(word.text);
         activeStoryIndex = null;
         renderStory();
+        updateSpawning();
         renderBoard(performance.now());
       }
 
       function spawnWord(now = performance.now()) {
         if (wordDeck.length === 0) {
           clearInterval(spawnTimer);
+          spawnTimer = null;
           boardEmpty.textContent = "Все слова этой партии показаны.";
           boardEmpty.hidden = falling.length > 0;
-          storyStatus.textContent = "Новых слов не будет. Выбирай оставшиеся или начни заново.";
+          updateStoryCounts();
           return;
         }
         const text = wordDeck.pop();
@@ -706,8 +772,31 @@
       function startFirstLevelTimers() {
         clearInterval(spawnTimer);
         clearInterval(frameTimer);
-        spawnTimer = setInterval(() => spawnWord(), 1450);
+        spawnTimer = null;
         frameTimer = setInterval(() => renderBoard(performance.now()), 100);
+        updateSpawning();
+      }
+
+      function updateSpawning() {
+        const canSpawn = !finished
+          && selected.length < maxSelectedFragments
+          && storyWordCount() < targetWordCount
+          && wordDeck.length > 0;
+        if (canSpawn && spawnTimer === null) {
+          spawnTimer = setInterval(() => spawnWord(), 1450);
+          return;
+        }
+        if (!canSpawn && spawnTimer !== null) {
+          clearInterval(spawnTimer);
+          spawnTimer = null;
+          falling = [];
+          boardEmpty.textContent = selected.length >= maxSelectedFragments
+            ? "Теперь допиши рассказ до 33 слов."
+            : storyWordCount() >= targetWordCount
+              ? "33 слова. Рассказ готов."
+              : "Все слова этой партии показаны.";
+          renderBoard(performance.now());
+        }
       }
 
       function shuffleWordDeck() {
@@ -718,11 +807,41 @@
         }
       }
 
+      function storyDropPlacement(clientX, clientY) {
+        const tokens = [...storyWords.querySelectorAll(".story-word")];
+        if (tokens.length === 0) return { index: 0, targetIndex: null, after: false };
+        let closest = null;
+        let closestDistance = Infinity;
+        tokens.forEach((token, index) => {
+          const rect = token.getBoundingClientRect();
+          const dx = clientX < rect.left ? rect.left - clientX : clientX > rect.right ? clientX - rect.right : 0;
+          const dy = clientY < rect.top ? rect.top - clientY : clientY > rect.bottom ? clientY - rect.bottom : 0;
+          const distance = dx * dx + dy * dy;
+          if (distance < closestDistance) {
+            const after = clientY >= rect.top && clientY <= rect.bottom
+              ? clientX > (rect.left + rect.right) / 2
+              : clientY > (rect.top + rect.bottom) / 2;
+            closestDistance = distance;
+            closest = { index, after };
+          }
+        });
+        return { index: closest.index + Number(closest.after), targetIndex: closest.index, after: closest.after };
+      }
+
+      function moveStoryFragment(from, insertionIndex) {
+        const [fragment] = selected.splice(from, 1);
+        const destination = insertionIndex > from ? insertionIndex - 1 : insertionIndex;
+        selected.splice(destination, 0, fragment);
+        activeStoryIndex = null;
+        renderStory(destination);
+      }
+
       function restart() {
         clearInterval(spawnTimer);
         clearInterval(frameTimer);
         falling = [];
         selected = [];
+        storyWriteIn.value = "";
         activeStoryIndex = null;
         finished = false;
         firstLevelPausedAt = null;
@@ -860,8 +979,12 @@
         }
         if (!storyDrag.started) return;
         event.preventDefault();
-        storyPaper.querySelectorAll(".drop-target").forEach((token) => token.classList.remove("drop-target"));
-        document.elementFromPoint(event.clientX, event.clientY)?.closest(".story-word")?.classList.add("drop-target");
+        storyPaper.querySelectorAll(".drop-target, .drop-before, .drop-after").forEach((token) => token.classList.remove("drop-target", "drop-before", "drop-after"));
+        const placement = storyDropPlacement(event.clientX, event.clientY);
+        if (placement.targetIndex !== null) {
+          const target = storyWords.querySelector(`[data-index="${placement.targetIndex}"]`);
+          target?.classList.add("drop-target", placement.after ? "drop-after" : "drop-before");
+        }
       });
 
       document.addEventListener("pointerup", (event) => {
@@ -869,14 +992,16 @@
         const drag = storyDrag;
         storyDrag = null;
         if (!drag.started) return;
-        const target = document.elementFromPoint(event.clientX, event.clientY)?.closest(".story-word");
-        const to = target ? Number(target.dataset.index) : -1;
-        if (to >= 0 && to !== drag.from) {
-          [selected[drag.from], selected[to]] = [selected[to], selected[drag.from]];
-          activeStoryIndex = null;
-          renderStory(to);
+        const dropTarget = document.elementFromPoint(event.clientX, event.clientY);
+        if (dropTarget && storyPaper.contains(dropTarget)) {
+          const placement = storyDropPlacement(event.clientX, event.clientY);
+          if (placement.index !== drag.from && placement.index !== drag.from + 1) {
+            moveStoryFragment(drag.from, placement.index);
+          } else {
+            storyWords.querySelectorAll(".is-dragging, .drop-target, .drop-before, .drop-after").forEach((token) => token.classList.remove("is-dragging", "drop-target", "drop-before", "drop-after"));
+          }
         } else {
-          storyPaper.querySelectorAll(".is-dragging, .drop-target").forEach((token) => token.classList.remove("is-dragging", "drop-target"));
+          storyWords.querySelectorAll(".is-dragging, .drop-target, .drop-before, .drop-after").forEach((token) => token.classList.remove("is-dragging", "drop-target", "drop-before", "drop-after"));
         }
         ignoreStoryClick = true;
         setTimeout(() => { ignoreStoryClick = false; }, 0);
@@ -884,7 +1009,12 @@
 
       document.addEventListener("pointercancel", () => {
         storyDrag = null;
-        storyPaper.querySelectorAll(".is-dragging, .drop-target").forEach((token) => token.classList.remove("is-dragging", "drop-target"));
+        storyWords.querySelectorAll(".is-dragging, .drop-target, .drop-before, .drop-after").forEach((token) => token.classList.remove("is-dragging", "drop-target", "drop-before", "drop-after"));
+      });
+
+      storyWriteIn.addEventListener("input", () => {
+        updateStoryCounts();
+        updateSpawning();
       });
 
       document.addEventListener("keydown", (event) => {
@@ -912,13 +1042,13 @@
         if (event.target === passageModal) passageModal.hidden = true;
       });
       finishButton.addEventListener("click", () => {
-        if (selected.length !== 33) return;
+        if (storyWordCount() !== targetWordCount) return;
         finished = true;
         clearInterval(spawnTimer);
         clearInterval(frameTimer);
         falling = [];
         renderBoard(performance.now());
-        finalStory.textContent = selected.join(" ");
+        finalStory.textContent = [...selected, storyWriteIn.value.trim()].filter(Boolean).join(" ");
         renderStory();
         modal.hidden = false;
         modalClose.focus();
@@ -928,6 +1058,7 @@
         if (event.target === modal) modal.hidden = true;
       });
       window.addEventListener("resize", () => renderBoard(performance.now()));
+      if (new Set(words).size !== words.length) throw new Error("The word deck must not contain repeated phrases");
       if (originalPassageWords.length !== 100) throw new Error(`Expected 100 source words, received ${originalPassageWords.length}`);
       renderPassage();
       restart();
