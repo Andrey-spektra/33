@@ -184,6 +184,7 @@
     .falling-word:nth-of-type(3n) { background: #f2d88c; }
     .falling-word:nth-of-type(5n) { background: #f29c7c; }
     .falling-word:hover, .falling-word:focus-visible { z-index: 2; border-color: white; background: white; outline: 2px solid var(--lime); }
+    .falling-word:disabled { cursor: not-allowed; opacity: .55; }
     .word-life { position: absolute; right: 0; bottom: 0; left: 0; height: 3px; background: rgb(24 52 47 / 19%); }
     .word-life span { display: block; height: 100%; background: var(--coral); transform-origin: left; }
     .board-actions { display: flex; min-height: 49px; align-items: center; justify-content: space-between; gap: 12px; }
@@ -315,25 +316,48 @@
     .story-word.drop-before { box-shadow: -2px 0 var(--coral); }
     .story-word.drop-after { box-shadow: 2px 0 var(--coral); }
     .story-word:focus-visible { outline: 2px solid var(--coral); outline-offset: 1px; }
-    .story-write-in {
+    .auto-word-select-label {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      margin: 12px 0 0;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 9px;
+      text-transform: uppercase;
+    }
+    .auto-word-select-label select {
+      min-height: 32px;
+      padding: 0 8px;
+      border: 1px solid var(--line);
+      border-radius: 0;
+      background: var(--white);
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: 11px;
+      text-transform: none;
+    }
+    .auto-word-select-label select:focus-visible { outline: 2px solid var(--coral); outline-offset: 1px; }
+    .manual-words { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px 12px; margin-top: 7px; }
+    .manual-word {
       display: block;
       width: 100%;
-      min-height: 93px;
-      margin-top: 5px;
-      padding: 5px 2px;
-      resize: vertical;
+      min-width: 0;
+      height: 30px;
+      padding: 3px 2px;
       border: 0;
-      border-top: 1px dashed #d7c9b9;
+      border-bottom: 1px dashed #d7c9b9;
       border-radius: 0;
       outline: none;
       background: transparent;
       color: var(--ink);
       font-family: var(--serif);
       font-size: 14px;
-      line-height: 30px;
+      line-height: 1.4;
     }
-    .story-write-in::placeholder { color: #9a9f93; font-style: italic; opacity: 1; }
-    .story-write-in:focus-visible { border-top-color: var(--coral); }
+    .manual-word::placeholder { color: #9a9f93; font-style: italic; opacity: 1; }
+    .manual-word:focus-visible { border-bottom-color: var(--coral); }
+    .manual-word[aria-invalid="true"] { border-bottom-color: #b84b3b; background: #f8dfd5; }
     .story-footer { display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: center; padding-top: 15px; }
     .story-status { margin: 0; color: var(--muted); font-size: 10px; line-height: 1.5; }
     .finish-button {
@@ -421,7 +445,7 @@
     <main class="main">
       <div class="eyebrow" id="page-eyebrow">Три уровня · уровень первый</div>
       <h1>33 слова</h1>
-      <p class="subtitle" id="page-subtitle">Лови слова на лету. Из выбранных собери историю ровно из 33 слов.</p>
+      <p class="subtitle" id="page-subtitle">Лови слова и фразы, затем дополни рассказ своими словами до 33.</p>
 
       <nav class="levels" aria-label="Уровни игры">
         <button class="level active" id="level-one-button" type="button" aria-current="step"><span class="level-number">01</span><span>Рассказ</span></button>
@@ -433,9 +457,9 @@
         <div class="play-panel">
           <div class="panel-heading">
             <span class="label">Поле слов</span>
-            <span class="timer-caption"><span class="timer-dot" aria-hidden="true"></span>каждое слово исчезнет через 8 секунд</span>
+            <span class="timer-caption"><span class="timer-dot" aria-hidden="true"></span>каждый фрагмент исчезнет через 8 секунд</span>
           </div>
-          <div class="board" id="board" aria-label="Нажми на падающее слово, чтобы добавить его в рассказ">
+          <div class="board" id="board" aria-label="Нажми на падающее слово или фразу, чтобы добавить в рассказ">
             <div class="board-empty" id="board-empty">Ждём первое слово…</div>
             <div class="board-caption" aria-hidden="true">поймай своё слово</div>
           </div>
@@ -450,14 +474,21 @@
             <span class="label">Твой рассказ</span>
             <span class="story-counts">
               <span class="word-count" id="word-count" aria-live="polite"><strong>0</strong> / 33 слов</span>
-              <span class="fragment-count" id="fragment-count">0 / 25 фрагментов</span>
+              <span class="fragment-count" id="fragment-count">0 / 10 автоматически</span>
             </span>
           </div>
           <div class="progress-track" role="progressbar" aria-label="Количество слов в рассказе" aria-valuemin="0" aria-valuemax="33" aria-valuenow="0" id="progress-track"><span id="progress-fill"></span></div>
-          <p class="story-note">Поймай до 25 слов и фраз. Переставляй отдельные слова, затем допиши рассказ</p>
+          <label class="auto-word-select-label" for="auto-word-limit">Сколько слов поймать автоматически?
+            <select id="auto-word-limit" aria-label="Количество слов для автоматического сбора">
+              <option value="10">10 слов</option>
+              <option value="20">20 слов</option>
+              <option value="30">30 слов</option>
+            </select>
+          </label>
+          <p class="story-note">Фраза считается по словам в ней. Пойманные слова нельзя редактировать — дополняй историю только в пустых полях.</p>
           <div class="story-paper" id="story-paper" aria-label="Составленный рассказ">
-            <div class="story-words" id="story-words" aria-live="polite"><span class="story-placeholder">Здесь начнётся твоя история…</span></div>
-            <textarea class="story-write-in" id="story-write-in" aria-label="Допиши рассказ своими словами" placeholder="Допиши историю своими словами…" spellcheck="true"></textarea>
+            <div class="story-words" id="story-words" aria-live="polite"><span class="story-placeholder">Пойманные слова появятся здесь…</span></div>
+            <div class="manual-words" id="manual-words" aria-label="Пустые поля для своих слов"></div>
           </div>
           <div class="story-footer">
             <p class="story-status" id="story-status">Выбор необратим. Порядок слов можно изменить.</p>
@@ -552,7 +583,8 @@
       const boardEmpty = document.querySelector("#board-empty");
       const storyPaper = document.querySelector("#story-paper");
       const storyWords = document.querySelector("#story-words");
-      const storyWriteIn = document.querySelector("#story-write-in");
+      const manualWords = document.querySelector("#manual-words");
+      const autoWordLimitSelect = document.querySelector("#auto-word-limit");
       const wordCount = document.querySelector("#word-count");
       const fragmentCount = document.querySelector("#fragment-count");
       const progress = document.querySelector("#progress-track");
@@ -604,9 +636,8 @@
       let originalPassageWords = passages[0].text.trim().split(/\s+/u).slice(0, 100);
       const lifetime = 8000;
       const targetWordCount = 33;
-      const maxSelectedFragments = 25;
+      let autoWordLimit = Number(autoWordLimitSelect.value);
       let selected = [];
-      let selectedFragments = 0;
       let falling = [];
       let passageWords = originalPassageWords.map((text) => ({ text, removed: false }));
       let activePassage = passages[0];
@@ -628,11 +659,36 @@
       }
 
       function selectedWordCount() {
-        return selected.reduce((count, fragment) => count + countWords(fragment), 0);
+        return selected.length;
+      }
+
+      function manualWordInputs() {
+        return [...manualWords.querySelectorAll(".manual-word")];
+      }
+
+      function validManualWords() {
+        return manualWordInputs()
+          .map((input) => input.value.trim())
+          .filter((word) => countWords(word) === 1);
       }
 
       function storyWordCount() {
-        return selectedWordCount() + countWords(storyWriteIn.value);
+        return selectedWordCount() + validManualWords().length;
+      }
+
+      function renderManualInputs() {
+        manualWords.replaceChildren();
+        const manualWordLimit = targetWordCount - autoWordLimit;
+        for (let index = 0; index < manualWordLimit; index++) {
+          const input = document.createElement("input");
+          input.className = "manual-word";
+          input.type = "text";
+          input.autocomplete = "off";
+          input.spellcheck = true;
+          input.placeholder = `Слово ${index + 1}`;
+          input.setAttribute("aria-label", `Своё слово ${index + 1} из ${manualWordLimit}`);
+          manualWords.append(input);
+        }
       }
 
       function wordForm(count) {
@@ -711,7 +767,7 @@
           firstLevelView.hidden = false;
           secondLevelView.hidden = true;
           pageEyebrow.textContent = "Три уровня · уровень первый";
-          pageSubtitle.textContent = "Лови слова на лету. Из выбранных собери историю ровно из 33 слов.";
+          pageSubtitle.textContent = "Лови слова и фразы, затем дополни рассказ своими словами до 33.";
           renderBoard(performance.now());
           startFirstLevelTimers();
           firstLevelPausedAt = null;
@@ -739,10 +795,10 @@
 
       function renderStory(focusIndex = null) {
         storyWords.replaceChildren();
-        if (selected.length === 0 && countWords(storyWriteIn.value) === 0) {
+        if (selected.length === 0) {
           const placeholder = document.createElement("span");
           placeholder.className = "story-placeholder";
-          placeholder.textContent = "Здесь начнётся твоя история…";
+          placeholder.textContent = "Пойманные слова появятся здесь…";
           storyWords.append(placeholder);
         } else {
           selected.forEach((word, index) => {
@@ -763,30 +819,32 @@
 
       function updateStoryCounts() {
         const count = storyWordCount();
+        const autoCount = selectedWordCount();
+        const invalidManualInput = manualWordInputs().some((input) => countWords(input.value) > 1);
         wordCount.querySelector("strong").textContent = String(count);
         wordCount.classList.toggle("complete", count === targetWordCount);
-        fragmentCount.textContent = `${selectedFragments} / ${maxSelectedFragments} фрагментов`;
+        fragmentCount.textContent = `${autoCount} / ${autoWordLimit} автоматически`;
         progress.setAttribute("aria-valuenow", String(Math.min(count, targetWordCount)));
         progressFill.style.width = `${Math.min(count / targetWordCount, 1) * 100}%`;
         progressFill.classList.toggle("complete", count === targetWordCount);
-        finishButton.disabled = count !== targetWordCount || finished;
-        storyStatus.textContent = count === targetWordCount
-          ? "Ровно 33 слова. Перетаскивай отдельные слова, чтобы менять порядок."
-          : count > targetWordCount
-            ? `В рассказе на ${count - targetWordCount} ${wordForm(count - targetWordCount)} больше. Сократи свой текст.`
-            : selectedFragments >= maxSelectedFragments
-              ? `Набор слов собран! Переставь их и добавь ещё ${targetWordCount - count} ${wordForm(targetWordCount - count)}, чтобы получилось 33.`
-              : `Добавь ещё ${targetWordCount - count} ${wordForm(targetWordCount - count)}. Можно поймать до ${maxSelectedFragments} фрагментов.`;
+        finishButton.disabled = count !== targetWordCount || autoCount !== autoWordLimit || invalidManualInput || finished;
+        storyStatus.textContent = invalidManualInput
+          ? "В каждом пустом поле должно быть ровно одно слово."
+          : count === targetWordCount
+            ? "Ровно 33 слова. Перетаскивай отдельные слова, чтобы менять порядок."
+            : autoCount < autoWordLimit
+              ? `Поймай ещё ${autoWordLimit - autoCount} ${wordForm(autoWordLimit - autoCount)}. Впиши по одному слову в каждое пустое поле.`
+              : `Заполни ещё ${manualWords.children.length - validManualWords().length} ${wordForm(manualWords.children.length - validManualWords().length)} в пустых полях.`;
       }
 
       function chooseWord(id) {
-        if (finished || selectedFragments >= maxSelectedFragments || storyWordCount() >= targetWordCount) return;
+        if (finished || selectedWordCount() >= autoWordLimit) return;
         const index = falling.findIndex((word) => word.id === id);
         if (index === -1) return;
-        if (storyWordCount() + countWords(falling[index].text) > targetWordCount) return;
+        const wordWeight = countWords(falling[index].text);
+        if (selectedWordCount() + wordWeight > autoWordLimit) return;
         const [word] = falling.splice(index, 1);
         selected.push(...word.text.trim().split(/\s+/u));
-        selectedFragments += 1;
         activeStoryIndex = null;
         renderStory();
         updateSpawning();
@@ -824,7 +882,10 @@
           button.dataset.id = String(word.id);
           button.style.left = `${((word.lane % lanes + 0.5) / lanes) * 100}%`;
           button.style.top = `${ratio * 79}%`;
-          button.setAttribute("aria-label", `Выбрать слово «${word.text}», исчезнет через ${Math.max(1, Math.ceil((lifetime - elapsed) / 1000))} секунд`);
+          const weight = countWords(word.text);
+          const remainingAutoWords = autoWordLimit - selectedWordCount();
+          button.disabled = weight > remainingAutoWords;
+          button.setAttribute("aria-label", `${button.disabled ? "Недоступно: " : "Выбрать: "}«${word.text}», ${weight} ${wordForm(weight)}, исчезнет через ${Math.max(1, Math.ceil((lifetime - elapsed) / 1000))} секунд`);
           button.append(document.createTextNode(word.text));
           const life = document.createElement("span");
           life.className = "word-life";
@@ -848,8 +909,7 @@
 
       function updateSpawning() {
         const canSpawn = !finished
-          && selectedFragments < maxSelectedFragments
-          && storyWordCount() < targetWordCount
+          && selectedWordCount() < autoWordLimit
           && wordDeck.length > 0;
         if (canSpawn && spawnTimer === null) {
           spawnTimer = setInterval(() => spawnWord(), 1450);
@@ -859,17 +919,16 @@
           clearInterval(spawnTimer);
           spawnTimer = null;
           falling = [];
-          boardEmpty.textContent = selectedFragments >= maxSelectedFragments
-            ? "Набор слов собран! Переставь слова и добавь свои, чтобы получилось ровно 33."
-            : storyWordCount() >= targetWordCount
-              ? "33 слова. Рассказ готов."
-              : "Все слова этой партии показаны.";
+          boardEmpty.textContent = selectedWordCount() >= autoWordLimit
+            ? `Поймано ${autoWordLimit} слов. Дополни рассказ в пустых полях.`
+            : "Все слова этой партии показаны.";
           renderBoard(performance.now());
         }
       }
 
       function shuffleWordDeck() {
-        wordDeck = [...words];
+        const individualWords = [...new Set(words.flatMap((phrase) => phrase.trim().split(/\s+/u)))];
+        wordDeck = [...words, ...individualWords];
         for (let index = wordDeck.length - 1; index > 0; index--) {
           const swapIndex = Math.floor(Math.random() * (index + 1));
           [wordDeck[index], wordDeck[swapIndex]] = [wordDeck[swapIndex], wordDeck[index]];
@@ -910,8 +969,7 @@
         clearInterval(frameTimer);
         falling = [];
         selected = [];
-        selectedFragments = 0;
-        storyWriteIn.value = "";
+        renderManualInputs();
         activeStoryIndex = null;
         finished = false;
         firstLevelPausedAt = null;
@@ -1082,13 +1140,16 @@
         storyWords.querySelectorAll(".is-dragging, .drop-target, .drop-before, .drop-after").forEach((token) => token.classList.remove("is-dragging", "drop-target", "drop-before", "drop-after"));
       });
 
-      storyWriteIn.addEventListener("input", () => {
+      manualWords.addEventListener("input", (event) => {
+        const input = event.target.closest(".manual-word");
+        if (!input) return;
+        input.setAttribute("aria-invalid", String(countWords(input.value) > 1));
         updateStoryCounts();
         updateSpawning();
       });
 
       document.addEventListener("keydown", (event) => {
-        if (modal.hidden && /^[1-6]$/.test(event.key) && !event.ctrlKey && !event.metaKey && !event.altKey) {
+        if (modal.hidden && !event.target.closest("input, textarea, select, [contenteditable='true']") && /^[1-6]$/.test(event.key) && !event.ctrlKey && !event.metaKey && !event.altKey) {
           const visibleWords = [...board.querySelectorAll(".falling-word")];
           const button = visibleWords[Number(event.key) - 1];
           if (button) chooseWord(Number(button.dataset.id));
@@ -1100,6 +1161,10 @@
       firstLevelButton.addEventListener("click", () => switchLevel(1));
       secondLevelButton.addEventListener("click", () => switchLevel(2));
       document.querySelector("#restart-button").addEventListener("click", restart);
+      autoWordLimitSelect.addEventListener("change", () => {
+        autoWordLimit = Number(autoWordLimitSelect.value);
+        restart();
+      });
       passageSelect.addEventListener("change", () => selectPassage(passageSelect.value));
       document.querySelector("#passage-reset").addEventListener("click", resetPassage);
       passageFinish.addEventListener("click", () => {
@@ -1113,13 +1178,13 @@
         if (event.target === passageModal) passageModal.hidden = true;
       });
       finishButton.addEventListener("click", () => {
-        if (storyWordCount() !== targetWordCount) return;
+        if (storyWordCount() !== targetWordCount || selectedWordCount() !== autoWordLimit) return;
         finished = true;
         clearInterval(spawnTimer);
         clearInterval(frameTimer);
         falling = [];
         renderBoard(performance.now());
-        finalStory.textContent = [...selected, storyWriteIn.value.trim()].filter(Boolean).join(" ");
+        finalStory.textContent = [...selected, ...validManualWords()].join(" ");
         renderStory();
         modal.hidden = false;
         modalClose.focus();
@@ -1130,6 +1195,7 @@
       });
       window.addEventListener("resize", () => renderBoard(performance.now()));
       if (new Set(words).size !== words.length) throw new Error("The word deck must not contain repeated phrases");
+      if (![10, 20, 30].includes(autoWordLimit)) throw new Error("The automatic word limit must be 10, 20, or 30");
       if (passages.length !== 20 || passages.some((passage) => passage.text.trim().split(/\s+/u).length < 100)) {
         throw new Error("The excerpt catalog must contain 20 texts with at least 100 words each");
       }
