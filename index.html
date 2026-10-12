@@ -204,82 +204,6 @@
     .quiet-button:hover { color: var(--ink); }
 
     .level-two-layout { grid-template-columns: minmax(0, 1.5fr) minmax(245px, .65fr); }
-    .hidden-object-layout { grid-template-columns: minmax(0, 1.5fr) minmax(245px, .65fr); }
-    .hidden-object-panel { min-width: 0; padding: 17px; border: 1px solid var(--line); background: var(--white); }
-    .hidden-object-scene {
-      position: relative;
-      width: 100%;
-      aspect-ratio: 1178 / 1024;
-      overflow: hidden;
-      margin-top: 13px;
-      background: #17202e;
-      isolation: isolate;
-      touch-action: manipulation;
-    }
-    .hidden-object-scene > img {
-      position: absolute;
-      top: 0;
-      left: 0;
-      height: 100%;
-      width: auto;
-      max-width: none;
-      user-select: none;
-      -webkit-user-drag: none;
-    }
-    .object-target {
-      position: absolute;
-      z-index: 1;
-      padding: 0;
-      border: 2px solid transparent;
-      border-radius: 50%;
-      background: transparent;
-      cursor: pointer;
-      transform: scale(.9);
-      transition: border-color 160ms ease, background-color 160ms ease, transform 160ms ease;
-    }
-    .object-target:hover, .object-target:focus-visible {
-      border-color: var(--lime);
-      background: rgb(213 237 116 / 18%);
-      outline: 2px solid rgb(24 52 47 / 60%);
-      transform: scale(1);
-    }
-    .object-target.found {
-      border-color: #d5ed74;
-      background: rgb(213 237 116 / 29%);
-      cursor: default;
-      transform: scale(1);
-    }
-    .object-target.found::after {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      display: grid;
-      width: 25px;
-      height: 25px;
-      place-items: center;
-      border-radius: 50%;
-      background: var(--lime);
-      color: var(--ink);
-      content: "✓";
-      font-weight: 700;
-      transform: translate(-50%, -50%);
-    }
-    .hidden-object-actions { display: flex; min-height: 49px; align-items: center; justify-content: space-between; gap: 12px; }
-    .hidden-object-status { min-height: 18px; margin: 0; color: var(--muted); font-size: 11px; }
-    .hidden-object-sidebar { display: flex; min-width: 0; flex-direction: column; padding: 19px; background: var(--green); color: var(--white); }
-    .hidden-object-sidebar .label { color: #c0cfc6; }
-    .hidden-object-count { display: flex; align-items: baseline; gap: 6px; margin-top: 15px; font-size: 11px; }
-    .hidden-object-count strong { color: var(--lime); font-family: var(--serif); font-size: 44px; font-weight: 500; line-height: 1; }
-    .hidden-object-progress { height: 3px; margin-top: 15px; background: rgb(255 255 255 / 20%); }
-    .hidden-object-progress span { display: block; width: 0; height: 100%; background: var(--lime); transition: width 180ms ease; }
-    .hidden-object-list { display: grid; gap: 0; margin: 17px 0; padding: 0; list-style: none; }
-    .hidden-object-list li { display: grid; grid-template-columns: 27px minmax(0, 1fr) auto; align-items: center; gap: 8px; min-height: 42px; border-bottom: 1px solid rgb(255 255 255 / 12%); color: #e5ebe6; font-size: 11px; }
-    .hidden-object-list li.found { color: #bdcfc2; text-decoration: line-through; text-decoration-color: var(--lime); }
-    .hidden-object-number { display: grid; width: 25px; height: 25px; place-items: center; border-radius: 50%; background: #f1e4d1; color: var(--ink); font-family: var(--serif); font-size: 14px; font-weight: 700; }
-    .hidden-object-clue { padding: 4px 0 4px 5px; border: 0; background: transparent; color: #c5d0f1; cursor: pointer; font-size: 10px; text-decoration: underline; text-underline-offset: 2px; }
-    .hidden-object-clue:hover { color: white; }
-    .hidden-object-hint { min-height: 35px; margin: auto 0 12px; color: #d6dfd9; font-size: 11px; line-height: 1.5; }
-    .level-three-layout[hidden], .hidden-object-layout[hidden] { display: none; }
     .passage-modes { display: flex; grid-column: 1 / -1; gap: 8px; }
     .passage-mode-button {
       min-height: 40px;
@@ -527,8 +451,6 @@
       .story-panel { min-height: 380px; padding: 16px; }
       .story-paper { min-height: 205px; }
       .level-two-layout { grid-template-columns: 1fr; }
-      .hidden-object-layout { grid-template-columns: 1fr; }
-      .hidden-object-sidebar { min-height: 400px; }
       .passage-panel { padding: 16px; }
       .passage-select { width: min(230px, 54vw); }
       .passage-paper { padding: 16px 14px; font-size: 15px; }
@@ -561,14 +483,14 @@
     </header>
 
     <main class="main">
-      <div class="eyebrow" id="page-eyebrow">Три игры · игра первая</div>
+      <div class="eyebrow" id="page-eyebrow">Три уровня · уровень первый</div>
       <h1>33 слова</h1>
       <p class="subtitle" id="page-subtitle">Лови слова и фразы, затем дополни рассказ своими словами до 33.</p>
 
       <nav class="levels" aria-label="Уровни игры">
         <button class="level active" id="level-one-button" type="button" aria-current="step"><span class="level-number">01</span><span>Рассказ</span></button>
         <button class="level" id="level-two-button" type="button"><span class="level-number">02</span><span>Режимы</span></button>
-        <button class="level" id="level-three-button" type="button"><span class="level-number">03</span><span>Несоответствия</span></button>
+        <div class="level soon" aria-label="Уровень 3, скоро"><span class="level-number">03</span><span>Уровень 3</span><span class="level-tag">скоро</span></div>
       </nav>
 
       <section class="game-layout" id="level-one" aria-label="Первый уровень: составление рассказа">
@@ -654,38 +576,6 @@
           <p class="passage-credit">10 рассказов · каждый можно сократить до 33 слов.</p>
         </aside>
       </section>
-      <section class="game-layout hidden-object-layout" id="level-three" aria-label="Третья игра: найди 10 несоответствий" hidden>
-        <div class="hidden-object-panel">
-          <div class="panel-heading">
-            <span class="label">Литературный кабинет</span>
-            <span class="timer-caption"><span class="timer-dot" aria-hidden="true"></span>ищи в своём темпе</span>
-          </div>
-          <div class="hidden-object-scene" id="hidden-object-scene" aria-label="Иллюстрация кабинета; нажимай на предметы, которые не вписываются в сцену">
-            <img src="ChatGPT%20Image%2012%20%D0%BE%D0%BA%D1%82.%202026%20%D0%B3.%2C%2020_58_23.png" alt="Уютный кабинет с читательницей, книгами, котом и фантастическим городом за окном">
-            <button class="object-target" type="button" data-object="guitar" style="left:16.1%;top:38.1%;width:8%;height:23%" aria-label="Предмет 1"></button>
-            <button class="object-target" type="button" data-object="bust" style="left:36.8%;top:5%;width:6%;height:11%" aria-label="Предмет 2"></button>
-            <button class="object-target" type="button" data-object="cat" style="left:70%;top:48%;width:21%;height:12%" aria-label="Предмет 3"></button>
-            <button class="object-target" type="button" data-object="mug" style="left:27.3%;top:67%;width:11%;height:13%" aria-label="Предмет 4"></button>
-            <button class="object-target" type="button" data-object="croissants" style="left:5%;top:77%;width:19.5%;height:14%" aria-label="Предмет 5"></button>
-            <button class="object-target" type="button" data-object="laptop" style="left:25.4%;top:77%;width:53%;height:23%" aria-label="Предмет 6"></button>
-            <button class="object-target" type="button" data-object="phone" style="left:71%;top:89%;width:20%;height:11%" aria-label="Предмет 7"></button>
-            <button class="object-target" type="button" data-object="cocktail" style="left:79%;top:67%;width:11%;height:19%" aria-label="Предмет 8"></button>
-            <button class="object-target" type="button" data-object="planet" style="left:76%;top:0;width:12%;height:13%" aria-label="Предмет 9"></button>
-            <button class="object-target" type="button" data-object="spaceship" style="left:71.5%;top:14%;width:8%;height:6%" aria-label="Предмет 10"></button>
-          </div>
-          <div class="hidden-object-actions">
-            <p class="hidden-object-status" id="hidden-object-status" aria-live="polite">Нажми на предмет, который кажется здесь чужим.</p>
-            <button class="quiet-button" id="hidden-object-reset" type="button">Начать заново</button>
-          </div>
-        </div>
-        <aside class="hidden-object-sidebar">
-          <span class="label">Найди 10 несоответствий</span>
-          <div class="hidden-object-count"><strong id="hidden-object-found">0</strong><span>из 10 найдено</span></div>
-          <div class="hidden-object-progress" id="hidden-object-progress" role="progressbar" aria-label="Найденные несоответствия" aria-valuemin="0" aria-valuemax="10" aria-valuenow="0"><span id="hidden-object-progress-fill"></span></div>
-          <ol class="hidden-object-list" id="hidden-object-list" aria-label="Список предметов"></ol>
-          <p class="hidden-object-hint" id="hidden-object-hint" aria-live="polite">Подсказки покажут примерную область на картинке.</p>
-        </aside>
-      </section>
       <div class="footer-note"><span>Одна история · 33 слова</span><span>Слова исчезают — твой шанс нет</span></div>
     </main>
   </div>
@@ -758,32 +648,10 @@
       const modalClose = document.querySelector("#modal-close");
       const firstLevelView = document.querySelector("#level-one");
       const secondLevelView = document.querySelector("#level-two");
-      const thirdLevelView = document.querySelector("#level-three");
       const firstLevelButton = document.querySelector("#level-one-button");
       const secondLevelButton = document.querySelector("#level-two-button");
-      const thirdLevelButton = document.querySelector("#level-three-button");
       const pageEyebrow = document.querySelector("#page-eyebrow");
       const pageSubtitle = document.querySelector("#page-subtitle");
-      const hiddenObjectScene = document.querySelector("#hidden-object-scene");
-      const hiddenObjectList = document.querySelector("#hidden-object-list");
-      const hiddenObjectFound = document.querySelector("#hidden-object-found");
-      const hiddenObjectProgress = document.querySelector("#hidden-object-progress");
-      const hiddenObjectProgressFill = document.querySelector("#hidden-object-progress-fill");
-      const hiddenObjectStatus = document.querySelector("#hidden-object-status");
-      const hiddenObjectHint = document.querySelector("#hidden-object-hint");
-      const hiddenObjectCatalog = [
-        { id: "guitar", name: "Электрогитара", clue: "Слева, рядом с креслом." },
-        { id: "bust", name: "Бюст античного философа", clue: "Слева, на книжной полке." },
-        { id: "cat", name: "Кот необычной расцветки", clue: "У окна, на подоконнике." },
-        { id: "mug", name: "Кружка с рисунком кота", clue: "Внизу слева, на столе." },
-        { id: "croissants", name: "Круассаны", clue: "Внизу слева, на тарелке." },
-        { id: "laptop", name: "Ноутбук с логотипом яблока", clue: "Внизу, в центре стола." },
-        { id: "phone", name: "Смартфон", clue: "Внизу справа, на столе." },
-        { id: "cocktail", name: "Коктейль с лаймом и мятой", clue: "Справа внизу, рядом со свечами." },
-        { id: "planet", name: "Планета с кольцами", clue: "В небе, над городом." },
-        { id: "spaceship", name: "Летающий космический корабль", clue: "В небе, левее замка." }
-      ];
-      const foundObjects = new Set();
       const passageEditor = document.querySelector("#passage-editor");
       const passageCount = document.querySelector("#passage-count");
       const passageTotal = document.querySelector("#passage-total");
@@ -972,107 +840,38 @@
       }
 
       function switchLevel(level) {
-        if (![1, 2, 3].includes(level) || level === activeLevel) return;
-        if (activeLevel === 1) {
-          clearInterval(spawnTimer);
-          clearInterval(frameTimer);
-          firstLevelPausedAt = performance.now();
-        }
-        if (level === 1) {
+        if (level === activeLevel) return;
+        const isFirstLevel = level === 1;
+        if (isFirstLevel) {
           const pausedFor = performance.now() - firstLevelPausedAt;
           falling.forEach((word) => { word.born += pausedFor; });
           firstLevelView.hidden = false;
           secondLevelView.hidden = true;
-          thirdLevelView.hidden = true;
-          pageEyebrow.textContent = "Три игры · игра первая";
+          pageEyebrow.textContent = "Три уровня · уровень первый";
           pageSubtitle.textContent = "Лови слова и фразы, затем дополни рассказ своими словами до 33.";
           renderBoard(performance.now());
           startFirstLevelTimers();
           firstLevelPausedAt = null;
         } else {
+          clearInterval(spawnTimer);
+          clearInterval(frameTimer);
+          firstLevelPausedAt = performance.now();
           firstLevelView.hidden = true;
-          secondLevelView.hidden = level !== 2;
-          thirdLevelView.hidden = level !== 3;
-          if (level === 2) {
-            pageEyebrow.textContent = "Три игры · игра вторая";
-            pageSubtitle.textContent = "Выбери режим: допиши предысторию или сократи рассказ до 33 слов.";
-            renderPassage();
-          } else {
-            pageEyebrow.textContent = "Три игры · игра третья";
-            pageSubtitle.textContent = "Осмотри литературный кабинет и найди 10 предметов, которые не вписываются в эту историю.";
-          }
+          secondLevelView.hidden = false;
+          pageEyebrow.textContent = "Три уровня · уровень второй";
+          pageSubtitle.textContent = "Выбери режим: допиши предысторию или сократи рассказ до 33 слов.";
+          renderPassage();
         }
         activeLevel = level;
-        [[firstLevelButton, 1], [secondLevelButton, 2], [thirdLevelButton, 3]].forEach(([button, buttonLevel]) => {
-          const isActive = level === buttonLevel;
-          button.classList.toggle("active", isActive);
-          if (isActive) button.setAttribute("aria-current", "step");
-          else button.removeAttribute("aria-current");
-        });
-      }
-
-      function updateHiddenObjectProgress() {
-        const count = foundObjects.size;
-        hiddenObjectFound.textContent = String(count);
-        hiddenObjectProgress.setAttribute("aria-valuenow", String(count));
-        hiddenObjectProgressFill.style.width = `${count * 10}%`;
-        if (count === hiddenObjectCatalog.length) {
-          hiddenObjectStatus.textContent = "Все 10 несоответствий найдены! Отличная наблюдательность.";
-          hiddenObjectHint.textContent = "Кабинет снова выглядит почти как обычное место для чтения.";
+        firstLevelButton.classList.toggle("active", isFirstLevel);
+        secondLevelButton.classList.toggle("active", !isFirstLevel);
+        if (isFirstLevel) {
+          firstLevelButton.setAttribute("aria-current", "step");
+          secondLevelButton.removeAttribute("aria-current");
+        } else {
+          secondLevelButton.setAttribute("aria-current", "step");
+          firstLevelButton.removeAttribute("aria-current");
         }
-      }
-
-      function renderHiddenObjectList() {
-        hiddenObjectList.replaceChildren();
-        hiddenObjectCatalog.forEach((object, index) => {
-          const item = document.createElement("li");
-          item.dataset.object = object.id;
-          const number = document.createElement("span");
-          number.className = "hidden-object-number";
-          number.textContent = String(index + 1);
-          const name = document.createElement("span");
-          name.textContent = object.name;
-          const clue = document.createElement("button");
-          clue.className = "hidden-object-clue";
-          clue.type = "button";
-          clue.textContent = "подсказка";
-          clue.setAttribute("aria-label", `Подсказка: ${object.name}`);
-          clue.addEventListener("click", () => {
-            hiddenObjectHint.textContent = `Подсказка ${index + 1}: ${object.clue}`;
-          });
-          item.append(number, name, clue);
-          hiddenObjectList.append(item);
-        });
-      }
-
-      function findHiddenObject(id) {
-        if (foundObjects.has(id)) return;
-        const object = hiddenObjectCatalog.find((entry) => entry.id === id);
-        if (!object) return;
-        foundObjects.add(id);
-        hiddenObjectScene.querySelector(`[data-object="${id}"].object-target`)?.classList.add("found");
-        const listItem = hiddenObjectList.querySelector(`li[data-object="${id}"]`);
-        listItem?.classList.add("found");
-        const index = hiddenObjectCatalog.findIndex((entry) => entry.id === id) + 1;
-        hiddenObjectStatus.textContent = `Верно: ${object.name}.`;
-        hiddenObjectHint.textContent = `Найдено ${foundObjects.size} из ${hiddenObjectCatalog.length}.`;
-        updateHiddenObjectProgress();
-        const target = hiddenObjectScene.querySelector(`[data-object="${id}"].object-target`);
-        target?.setAttribute("aria-label", `Найдено: ${index}. ${object.name}`);
-        target?.setAttribute("aria-pressed", "true");
-      }
-
-      function resetHiddenObjectGame() {
-        foundObjects.clear();
-        hiddenObjectScene.querySelectorAll(".object-target").forEach((target, index) => {
-          target.classList.remove("found");
-          target.setAttribute("aria-label", `Предмет ${index + 1}`);
-          target.removeAttribute("aria-pressed");
-        });
-        hiddenObjectList.querySelectorAll("li").forEach((item) => item.classList.remove("found"));
-        hiddenObjectStatus.textContent = "Нажми на предмет, который кажется здесь чужим.";
-        hiddenObjectHint.textContent = "Подсказки покажут примерную область на картинке.";
-        updateHiddenObjectProgress();
       }
 
       function renderStory(focusIndex = null) {
@@ -1494,7 +1293,7 @@
       });
 
       document.addEventListener("keydown", (event) => {
-        if (activeLevel === 1 && modal.hidden && !event.target.closest("input, textarea, select, [contenteditable='true']") && /^[1-6]$/.test(event.key) && !event.ctrlKey && !event.metaKey && !event.altKey) {
+        if (modal.hidden && !event.target.closest("input, textarea, select, [contenteditable='true']") && /^[1-6]$/.test(event.key) && !event.ctrlKey && !event.metaKey && !event.altKey) {
           const visibleWords = [...board.querySelectorAll(".falling-word")];
           const button = visibleWords[Number(event.key) - 1];
           if (button) chooseWord(Number(button.dataset.id));
@@ -1505,16 +1304,6 @@
 
       firstLevelButton.addEventListener("click", () => switchLevel(1));
       secondLevelButton.addEventListener("click", () => switchLevel(2));
-      thirdLevelButton.addEventListener("click", () => switchLevel(3));
-      hiddenObjectScene.addEventListener("click", (event) => {
-        const target = event.target.closest(".object-target");
-        if (target) {
-          findHiddenObject(target.dataset.object);
-          return;
-        }
-        hiddenObjectStatus.textContent = "Пока не оно. Осмотрись и попробуй ещё.";
-      });
-      document.querySelector("#hidden-object-reset").addEventListener("click", resetHiddenObjectGame);
       prehistoryModeButton.addEventListener("click", () => switchPassageMode("prehistory"));
       shortenModeButton.addEventListener("click", () => switchPassageMode("shorten"));
       prehistoryInput.addEventListener("input", updatePrehistoryCount);
@@ -1560,8 +1349,6 @@
       if (passages.length !== 10 || passages.some((passage) => !passage.text.trim())) {
         throw new Error("The excerpt catalog must contain 10 non-empty texts");
       }
-      renderHiddenObjectList();
-      resetHiddenObjectGame();
       switchPassageMode(activePassageMode);
       populatePassages();
       renderPassage();
