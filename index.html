@@ -316,6 +316,16 @@
     .story-word.drop-before { box-shadow: -2px 0 var(--coral); }
     .story-word.drop-after { box-shadow: 2px 0 var(--coral); }
     .story-word:focus-visible { outline: 2px solid var(--coral); outline-offset: 1px; }
+    .story-word.custom-story-word {
+      max-width: 100%;
+      padding: 1px 1px 2px;
+      border-radius: 0;
+      cursor: text;
+      outline: none;
+      user-select: text;
+      -webkit-user-select: text;
+    }
+    .story-word.custom-story-word[aria-invalid="true"] { border-bottom-color: #b84b3b; background: #f8dfd5; }
     .auto-word-select-label {
       display: flex;
       align-items: center;
@@ -485,7 +495,7 @@
               <option value="30">30 слов</option>
             </select>
           </label>
-          <p class="story-note">Фраза считается по словам в ней. Пойманные слова нельзя редактировать — дополняй историю только в пустых полях.</p>
+          <p class="story-note">Фраза считается по словам в ней. Свои слова можно редактировать прямо в рассказе и переставлять вместе с остальными.</p>
           <div class="story-paper" id="story-paper" aria-label="Составленный рассказ">
             <div class="story-words" id="story-words" aria-live="polite"><span class="story-placeholder">Пойманные слова появятся здесь…</span></div>
             <div class="manual-words" id="manual-words" aria-label="Пустые поля для своих слов"></div>
@@ -515,7 +525,7 @@
         </div>
         <aside class="passage-sidebar">
           <span class="label">Сократи отрывок</span>
-          <div class="passage-count"><strong id="passage-count">100</strong><span>слов осталось</span></div>
+          <div class="passage-count"><strong id="passage-count">135</strong><span>из <span id="passage-total">135</span> слов осталось</span></div>
           <p class="passage-target">В рассказе должно быть ровно 33</p>
           <div class="passage-progress" id="passage-progress" role="progressbar" aria-label="Сколько лишних слов убрано" aria-valuemin="0" aria-valuemax="67" aria-valuenow="0"><span id="passage-progress-fill"></span></div>
           <p class="passage-status" id="passage-status" aria-live="polite">Убери 67 слов. Оставшиеся можно переставить.</p>
@@ -602,6 +612,7 @@
       const pageSubtitle = document.querySelector("#page-subtitle");
       const passageEditor = document.querySelector("#passage-editor");
       const passageCount = document.querySelector("#passage-count");
+      const passageTotal = document.querySelector("#passage-total");
       const passageProgress = document.querySelector("#passage-progress");
       const passageProgressFill = document.querySelector("#passage-progress-fill");
       const passageStatus = document.querySelector("#passage-status");
@@ -609,31 +620,21 @@
       const passageModal = document.querySelector("#passage-modal");
       const passageResult = document.querySelector("#passage-result");
       const passages = [
-        { id: "metel", title: "Метель", author: "Александр Пушкин", year: "1831", page: "Повести покойного Ивана Петровича Белкина (Пушкин)/Метель", text: `В конце 1811 года, в эпоху нам достопамятную, жил в своем поместье Ненарадове добрый Гаврила Гаврилович Р**. Он славился во всей округе гостеприимством и радушием; соседи поминутно ездили к нему поесть, попить, поиграть по пяти копеек в бостон с его женою, а некоторые для того, чтоб поглядеть на дочку их, Марью Гавриловну, стройную, бледную и семнадцатилетнюю девицу. Она считалась богатой невестою, и многие прочили ее за себя или за сыновей. Марья Гавриловна была воспитана на французских романах, и следственно была влюблена. Предмет, избранный ею, был бедный армейский прапорщик, находившийся в отпуску в своей деревне. Само по себе разумеется, что молодой` },
-        { id: "station-master", title: "Станционный смотритель", author: "Александр Пушкин", year: "1831", page: "Повести покойного Ивана Петровича Белкина (Пушкин)/Станционный смотритель", text: `Кто не проклинал станционных смотрителей, кто с ними не бранивался? Кто, в минуту гнева, не требовал от них роковой книги, дабы вписать в оную свою бесполезную жалобу на притеснение, грубость и неисправность? Кто не почитает их извергами человеческого рода, равными покойным подъячим или, по крайней мере, муромским разбойникам? Будем однако справедливы, постараемся войти в их положение, и может быть, станем судить о них гораздо снисходительнее. Что такое станционный смотритель? Сущий мученик четырнадцатого класса, огражденный своим чином токмо от побоев, и то не всегда (ссылаюсь на совесть моих читателей). Какова должность сего диктатора, как называет его шутливо князь Вяземский? Не настоящая` },
-        { id: "lady-peasant", title: "Барышня-крестьянка", author: "Александр Пушкин", year: "1831", page: "Повести покойного Ивана Петровича Белкина (Пушкин)/Барышня-крестьянка", text: `В одной из отдаленных наших губерний находилось имение Ивана Петровича Берестова. В молодости своей служил он в гвардии, вышел в отставку в начале 1797 года, уехал в свою деревню и с тех пор он оттуда не выезжал. Он был женат на бедной дворянке, которая умерла в родах, в то время, как он находился в отъезжем поле. Хозяйственные упражнения скоро его утешили. Он выстроил дом по собственному плану, завел у себя суконную фабрику, утроил доходы и стал почитать себя умнейшим человеком во всей околодке, в чем и не прекословили ему соседи, приезжавшие к нему гостить с своими семействами и собаками. В` },
-        { id: "queen-spades", title: "Пиковая дама", author: "Александр Пушкин", year: "1834", page: "Пиковая дама (Пушкин)", text: `Однажды играли в карты у конногвардейца Нарумова. Долгая зимняя ночь прошла незаметно; сели ужинать в пятом часу утра. Те, которые остались в выигрыше, ели с большим аппетитом; прочие, в рассеянности, сидели перед пустыми своими приборами. Но шампанское явилось, разговор оживился, и все приняли в нем участие. — Что ты сделал, Сурин? — спросил хозяин. — Проиграл, по обыкновению. Надобно признаться, что я несчастлив: играю мирандолем, никогда не горячусь, ничем меня с толку не собьешь, а всё проигрываюсь! — И ты ни разу не соблазнился? ни разу не поставил на руте ?.. Твердость твоя для меня удивительна. — А каков Германн!` },
-        { id: "shot", title: "Выстрел", author: "Александр Пушкин", year: "1831", page: "Повести покойного Ивана Петровича Белкина (Пушкин)/Выстрел", text: `Мы стояли в местечке ***. Жизнь армейского офицера известна. Утром ученье, манеж; обед у полкового командира или в жидовском трактире; вечером пунш и карты. В *** не было ни одного открытого дома, ни одной невесты; мы собирались друг у друга, где, кроме своих мундиров, не видали ничего. Один только человек принадлежал нашему обществу, не будучи военным. Ему было около тридцати пяти лет, и мы за то почитали его стариком. Опытность давала ему перед нами многие преимущества; к тому же его обыкновенная угрюмость, крутой нрав и злой язык имели сильное влияние на молодые наши умы. Какая-то таинственность окружала его судьбу; он` },
-        { id: "undertaker", title: "Гробовщик", author: "Александр Пушкин", year: "1831", page: "Повести покойного Ивана Петровича Белкина (Пушкин)/Гробовщик", text: `Последние пожитки гробовщика Адриана Прохорова были взвалены на похоронные дроги, и тощая пара в четвертый раз потащилась с Басманной на Никитскую, куда гробовщик переселялся всем своим домом. Заперев лавку, прибил он к воротам объявление о том, что дом продается и отдается в наймы, и пешком отправился на новоселье. Приближаясь к желтому домику, так давно соблазнявшему его воображение и наконец купленному им за порядочную сумму, старый гробовщик чувствовал с удивлением, что сердце его не радовалось. Переступив за незнакомый порог и найдя в новом своем жилище суматоху, он вздохнул о ветхой лачужке, где в течении осьмнадцати лет всё было заведено самым строгим` },
-        { id: "mtsyri", title: "Мцыри", author: "Михаил Лермонтов", year: "1840", page: "Мцыри (Лермонтов)", text: `Немного лет тому назад, Там, где, сливаяся, шумят, Обнявшись, будто две сестры, Струи Арагвы и Куры, Был монастырь. Из-за горы И нынче видит пешеход Столбы обрушенных ворот, И башни, и церковный свод; Но не курится уж под ним Кадильниц благовонный дым, Не слышно пенье в поздний час Молящих иноков за нас. Теперь один старик седой, Развалин страж полуживой, Людьми и смертию забыт, Сметает пыль с могильных плит, Которых надпись говорит О славе прошлой — и о том, Как, удручен своим венцом, Такой-то царь, в такой-то год, Вручал России свой народ. И божья благодать сошла На Грузию! Она цвела С тех пор в тени своих садов, Не опасаяся врагов, За гранью` },
-        { id: "mumu", title: "Муму", author: "Иван Тургенев", year: "1854", page: "Муму (Тургенев)", text: `В одной из отдаленных улиц Москвы, в сером доме с белыми колоннами, антресолью и покривившимся балконом, жила некогда барыня, вдова, окруженная многочисленною дворней. Сыновья ее служили в Петербурге, дочери вышли замуж; она выезжала редко и уединенно доживала последние годы своей скупой и скучающей старости. День ее, нерадостный и ненастный, давно прошел; но и вечер ее был чернее ночи. Из числа всей ее челяди самым замечательным лицом был дворник Герасим, мужчина двенадцати вершков роста, сложенный богатырем и глухонемой от рожденья. Барыня взяла его из деревни, где он жил один, в небольшой избушке, отдельно от братьев, и считался едва ли не самым` },
-        { id: "white-nights", title: "Белые ночи", author: "Фёдор Достоевский", year: "1848", page: "Белые ночи (Достоевский)", text: `Была чудная ночь, такая ночь, которая разве только и может быть тогда, когда мы молоды, любезный читатель. Небо было такое звездное, такое светлое небо, что, взглянув на него, невольно нужно было спросить себя: неужели же могут жить под таким небом разные сердитые и капризные люди? Это тоже молодой вопрос, любезный читатель, очень молодой, но пошли его вам господь чаще на душу! Говоря о капризных и разных сердитых господах, я не мог не припомнить и своего благонравного поведения во весь этот день. С самого утра меня стала мучить какая-то удивительная тоска. Мне вдруг показалось, что меня, одинокого, все покидают и что` },
-        { id: "christmas-eve", title: "Ночь перед Рождеством", author: "Николай Гоголь", year: "1832", page: "Ночь перед Рождеством (Гоголь)", text: `Последний день перед Рождеством прошел. Зимняя, ясная ночь наступила. Глянули звезды. Месяц величаво поднялся на небо посветить добрым людям и всему миру, чтобы всем было весело колядовать и славить Христа. Морозило сильнее, чем с утра; но зато так было тихо, что скрып мороза под сапогом слышался за полверсты. Еще ни одна толпа парубков не показывалась под окнами хат; месяц один только заглядывал в них украдкою, как бы вызывая принаряживавшихся девушек выбежать скорее на скрыпучий снег. Тут через трубу одной хаты клубами повалился дым и пошел тучею по небу, и вместе с дымом поднялась ведьма верхом на метле. Если бы в` },
-        { id: "lady-dog", title: "Дама с собачкой", author: "Антон Чехов", year: "1899", page: "Дама с собачкой (Чехов)", text: `Говорили, что на набережной появилось новое лицо: дама с собачкой. Дмитрий Дмитрич Гуров, проживший в Ялте уже две недели и привыкший тут, тоже стал интересоваться новыми лицами. Сидя в павильоне у Верне, он видел, как по набережной прошла молодая дама, невысокого роста блондинка, в берете; за нею бежал белый шпиц. И потом он встречал ее в городском саду и на сквере по нескольку раз в день. Она гуляла одна, всё в том же берете, с белым шпицем; никто не знал, кто она, и называли ее просто так: дама с собачкой. «Если она здесь без мужа и без знакомых, — соображал` },
-        { id: "kashtanka", title: "Каштанка", author: "Антон Чехов", year: "1887", page: "Каштанка (Чехов)", text: `Молодая рыжая собака — помесь такса с дворняжкой — очень похожая мордой на лисицу, бегала взад и вперед по тротуару и беспокойно оглядывалась по сторонам. Изредка она останавливалась и, плача, приподнимая то одну озябшую лапу, то другую, старалась дать себе отчет: как это могло случиться, что она заблудилась? Она отлично помнила, как она провела день и как в конце концов попала на этот незнакомый тротуар. День начался с того, что ее хозяин, столяр Лука Александрыч, надел шапку, взял под мышку какую-то деревянную штуку, завернутую в красный платок, и крикнул: — Каштанка, пойдем! Услышав свое имя, помесь таксы с дворняжкой вышла` },
-        { id: "death-official", title: "Смерть чиновника", author: "Антон Чехов", year: "1883", page: "Смерть чиновника (Чехов)", text: `В один прекрасный вечер не менее прекрасный экзекутор, Иван Дмитрич Червяков, сидел во втором ряду кресел и глядел в бинокль на «Корневильские колокола». Он глядел и чувствовал себя на верху блаженства. Но вдруг… В рассказах часто встречается это «но вдруг». Авторы правы: жизнь так полна внезапностей! Но вдруг лицо его поморщилось, глаза подкатились, дыхание остановилось… он отвел от глаз бинокль, нагнулся и… апчхи!!! Чихнул, как видите. Чихать никому и нигде не возбраняется. Чихают и мужики, и полицеймейстеры, и иногда даже и тайные советники. Все чихают. Червяков нисколько не сконфузился, утерся платочком и, как вежливый человек, поглядел вокруг себя: не обеспокоил` },
-        { id: "tsar-saltan", title: "Сказка о царе Салтане", author: "Александр Пушкин", year: "1831", page: "Сказка о царе Салтане (Пушкин)", text: `Три девицы под окном Пряли поздно вечерком. «Кабы я была царица, — Говорит одна девица, — То на весь крещеный мир Приготовила б я пир». «Кабы я была царица, — Говорит ее сестрица, — То на весь бы мир одна Наткала я полотна». «Кабы я была царица, — Третья молвила сестрица, — Я б для батюшки-царя Родила богатыря». Только вымолвить успела, Дверь тихонько заскрипела, И в светлицу входит царь, Стороны той государь. Во все время разговора Он стоял позадь забора; Речь последней по всему Полюбилася ему. «Здравствуй, красная девица, — Говорит он, — будь царица И роди богатыря Мне к` },
-        { id: "dead-princess", title: "Сказка о мёртвой царевне", author: "Александр Пушкин", year: "1833", page: "Сказка о мёртвой царевне (Пушкин)", text: `Царь с царицею простился, В путь-дорогу снарядился, И царица у окна Села ждать его одна. Ждет-пождет с утра до ночи, Смотрит в поле, инда очи Разболелись глядючи С белой зори до ночи; Не видать милого друга! Только видит: вьется вьюга, Снег валится на поля, Вся белешенька земля. Девять месяцев проходит, С поля глаз она не сводит. Вот в сочельник в самый, в ночь Бог дает царице дочь. Рано утром гость желанный, День и ночь так долго жданный, Издалеча наконец Воротился царь-отец. На него она взглянула, Тяжеленько вздохнула, Восхищенья не снесла И к обедне умерла. Долго царь был неутешен, Но как` },
-        { id: "ruslan", title: "Руслан и Людмила", author: "Александр Пушкин", year: "1820", page: "Руслан и Людмила (Пушкин)", text: `У лукоморья дуб зеленый; Златая цепь на дубе том: И днем и ночью кот ученый Все ходит по цепи кругом; Идет направо — песнь заводит, Налево — сказку говорит. Там чудеса: там леший бродит, Русалка на ветвях сидит; Там на неведомых дорожках Следы невиданных зверей; Избушка там на курьих ножках Стоит без окон, без дверей; Там лес и дол видений полны; Там о заре прихлынут волны На брег песчаный и пустой, И тридцать витязей прекрасных Чредой из вод выходят ясных, И с ними дядька их морской; Там королевич мимоходом Пленяет грозного царя; Там в облаках перед народом Через леса, через` },
-        { id: "bronze-horseman", title: "Медный всадник", author: "Александр Пушкин", year: "1833", page: "Медный всадник (Пушкин)", text: `На берегу пустынных волн Стоял он, дум великих полн, И вдаль глядел. Пред ним широко Река неслася; бедный челн По ней стремился одиноко. По мшистым, топким берегам Чернели избы здесь и там, Приют убогого чухонца; И лес, неведомый лучам В тумане спрятанного солнца, Кругом шумел. Отсель грозить мы б И думал он: Отсель грозить мы будем шведу, Здесь будет город заложен На зло надменному соседу. Природой здесь нам суждено В Европу прорубить окно, Ногою твердой стать при море. Сюда по новым им волнам Все флаги в гости будут к нам, И запируем на просторе. Прошло сто лет, и юный град, Полнощных стран краса и диво, Из тьмы лесов` },
-        { id: "fisherman-fish", title: "Сказка о рыбаке и рыбке", author: "Александр Пушкин", year: "1833", page: "Сказка о рыбаке и рыбке (Пушкин)", text: `Жил старик со своею старухой У самого синего моря; Они жили в ветхой землянке Ровно тридцать лет и три года. Старик ловил неводом рыбу, Старуха пряла свою пряжу. Раз он в море закинул невод, — Пришел невод с одною тиной. Он в другой раз закинул невод, Пришел невод с травой морскою. В третий раз закинул он невод, — Пришел невод с одною рыбкой, С непростою рыбкой, — золотою. Как взмолится золотая рыбка! Голосом молвит человечьим: «Отпусти ты, старче, меня в море, Дорогой за себя дам откуп: Откуплюсь чем только пожелаешь.» Удивился старик, испугался: Он рыбачил тридцать лет и три года` },
-        { id: "golden-cockerel", title: "Сказка о золотом петушке", author: "Александр Пушкин", year: "1834", page: "Сказка о золотом петушке (Пушкин)", text: `Негде, в тридевятом царстве, В тридесятом государстве, Жил-был славный царь Дадон. С молоду был грозен он И соседям то и дело Наносил обиды смело; Но под старость захотел Отдохнуть от ратных дел И покой себе устроить. Тут соседи беспокоить Стали старого царя, Страшный вред ему творя. Чтоб концы своих владений Охранять от нападений, Должен был он содержать Многочисленную рать. Воеводы не дремали, Но никак не успевали. Ждут бывало с юга, — глядь, — Ан с востока лезет рать! Справят здесь, — лихие гости Идут от моря. Со злости Инда плакал царь Дадон, Инда забывал и сон. Что и жизнь в` },
-        { id: "boris-godunov", title: "Борис Годунов", author: "Александр Пушкин", year: "1831", page: "Борис Годунов (Пушкин)", text: `Еще одно, последнее сказанье — И летопись окончена моя, Исполнен долг, завещанный от Бога Мне, грешному. Недаром многих лет Свидетелем Господь меня поставил И книжному искусству вразумил: Когда-нибудь монах трудолюбивый Найдет мой труд усердный, безымянный; Засветит он, как я, свою лампаду И, пыль веков от хартий отряхнув, Правдивые сказанья перепишет, Да ведают потомки православных Земли родной минувшую судьбу, Своих царей великих поминают За их труды, за славу, за добро — А за грехи, за темные деянья Спасителя смиренно умоляют. На старости я сызнова живу; Минувшее проходит предо мною — Давно ль оно неслось, событий полно, Волнуяся, как море-окиан? Теперь оно` }
+        { id: "queen-spades", title: "Пиковая дама", author: "А.С. Пушкин", year: "1834", page: "Пиковая дама (Пушкин)", text: `Германн ночью пробрался в дом графини. Он поднялся по лестнице и вошёл в её комнату. Там было темно. Он зажёг свечу и увидел портрет. Он стал ждать. Вскоре послышались шаги. Германн спрятался за ширмы. Вошла графиня. Она начала раздеваться. Германн смотрел на неё и думал о том, что ему нужно. Он вышел из-за ширм. Графиня испугалась. Он сказал ей, что ему нужно. Она молчала. Он показал пистолет. Графиня умерла от страха. Германн остался один. Он понял, что убил человека. Он не знал, что делать дальше. Он вышел из дома и пошёл куда глаза глядят. Он думал о том, что теперь его жизнь кончена. Он не мог вернуться назад. Он шёл всю ночь. К утру он оказался у дома Лизаветы Ивановны. Он не знал, зачем пришёл. Он стоял и смотрел на окна. Потом повернулся и ушёл.` },
+        { id: "dead-souls", title: "Мёртвые души", author: "Н.В. Гоголь", year: "1842", page: "Мёртвые души (Гоголь)", text: `Чичиков подъехал к дому Плюшкина. Дом выглядел заброшенным. Он вошёл во двор и увидел странного человека. Тот был в старом халате и походил на нищего. Чичиков долго не мог понять, кто это. Плюшкин пригласил его в дом. Внутри было грязно и темно. На стенах висели старые картины. В углу лежала куча хлама. Чичиков предложил купить мёртвые души. Плюшкин обрадовался и согласился. Он продал души и был очень доволен. Чичиков уехал, а Плюшкин остался один в своём запущенном доме. Он долго смотрел вслед телеге. Потом вернулся в дом и сел в кресло. Он думал о том, что теперь у него есть деньги. Он был счастлив. Но через минуту он снова стал жадничать. Он жалел, что продал души так дешево.` },
+        { id: "fathers-and-sons", title: "Отцы и дети", author: "И.С. Тургенев", year: "1862", page: "Отцы и дети (Тургенев)", text: `Базаров лежал в постели. Он чувствовал, что умирает. Он думал о своих родителях. Он думал об Одинцовой. Он думал о жизни. Он понял, что жизнь коротка. Он понял, что не успел сделать многое. Он пожалел, что не любил. Он бредил. Он звал Одинцову. Она пришла. Она поцеловала его. Он умер. Родители остались одни. Они не могли поверить в его смерть. Они плакали. Они молились. Они не знали, как жить дальше. Они сидели в пустом доме и смотрели друг на друга. Они вспоминали сына. Они хотели вернуть его. Но он ушёл навсегда. Они остались одни.` },
+        { id: "crime-and-punishment", title: "Преступление и наказание", author: "Ф.М. Достоевский", year: "1866", page: "Преступление и наказание (Достоевский)", text: `Раскольников вернулся домой. Он лёг на диван. Он думал о том, что сделал. Он думал о старухе. Он думал о Лизавете. Он думал о том, что его могут поймать. Он чувствовал страх. Он чувствовал отвращение. Он не мог понять, зачем убил. Он думал о том, что он не Наполеон. Он встал и подошёл к окну. Он смотрел на улицу. Он видел людей. Он завидовал им. Он хотел быть как они. Но не мог. Он снова лёг. Он закрыл глаза. Он хотел забыться. Но сон не приходил. Он ворочался. Он думал о матери. Он думал о сестре. Он думал о том, что теперь он один. Он не знал, что делать. Он хотел пойти и во всём признаться. Но боялся. Он лежал и смотрел в потолок. Так прошла ночь.` },
+        { id: "war-and-peace", title: "Война и мир", author: "Л.Н. Толстой", year: "1869", page: "Война и мир (Толстой)", text: `Князь Андрей лежал на поле. Он смотрел в небо. Он думал о том, что всё это неважно. Он думал о своей жене. Он думал о Наполеоне. Он понял, что счастье в том, чтобы жить. Он понял, что смерть не страшна. Он хотел жить. Он видел, как французы подошли к нему. Они хотели его убить. Но он не боялся. Он думал о вечном. Он понял, что есть что-то большее. Он потерял сознание. Его спасли. Он выжил. Но он стал другим. Он лежал в лазарете. Он смотрел на других раненых. Он думал о том, что все они братья. Он хотел помочь им. Он забыл о славе. Он забыл о войне. Он думал только о мире. Он хотел вернуться домой. Но не знал, что его ждёт.` },
+        { id: "lady-with-dog", title: "Дама с собачкой", author: "А.П. Чехов", year: "1899", page: "Дама с собачкой (Чехов)", text: `Гуров вернулся в Москву. Он думал об Анне Сергеевне. Он понял, что полюбил её. Он не мог её забыть. Он ходил по улицам. Он искал её. Он не находил. Он был одинок. Он понял, что без неё ему плохо. Он поехал в город, где она жила. Он нашёл её. Он понял, что их любовь только начинается. Он не знал, что будет дальше. Но он был счастлив. Он хотел, чтобы это никогда не кончалось. Он думал о том, как они будут жить. Он представлял их будущее. Он хотел быть с ней всегда. Он не боялся осуждения. Он был готов на всё. Он ждал её. Он смотрел на часы. Он волновался. Он хотел увидеть её снова.` },
+        { id: "oblomov", title: "Обломов", author: "И.А. Гончаров", year: "1859", page: "Обломов (Гончаров)", text: `Обломов лежал на диване. Он думал о том, что надо встать. Он думал о делах. Он не хотел вставать. Он лежал и мечтал. Он хотел покоя. Он не хотел ничего делать. Он слышал, как зовут его. Он не отвечал. Он хотел, чтобы его оставили в покое. Он думал о детстве. Он думал о матери. Он хотел вернуться туда. Он закрыл глаза. Он снова заснул. Он не хотел просыпаться. Он спал и видел сны. Во сне он был счастлив. Он гулял по саду. Он играл с друзьями. Он был ребёнком. Он не хотел взрослеть. Он боялся жизни. Он хотел остаться в детстве навсегда. Но сон кончился. Он проснулся. И снова увидел свой диван.` },
+        { id: "enchanted-wanderer", title: "Очарованный странник", author: "Н.С. Лесков", year: "1873", page: "Очарованный странник (Лесков)", text: `Иван жил у татар. Он тосковал по родине. Он думал о побеге. Он не мог убежать. Он страдал. Он молился. Он ждал. Он пас лошадей. Он жил в степи. Он не знал языка. Он был один. Он хотел домой. Он мечтал о свободе. Однажды он решился. Он убежал. Он шёл много дней. Он вернулся домой. Он был счастлив. Он рассказал свою историю. Он стал странником. Он ходил по монастырям. Он искал покой. Он не находил его. Он думал о своей жизни. Он понимал, что много страдал. Но он не жалел. Он верил, что так было нужно. Он продолжал свой путь. Он шёл и молился. Он хотел спасти свою душу.` },
+        { id: "garnet-bracelet", title: "Гранатовый браслет", author: "А.И. Куприн", year: "1911", page: "Гранатовый браслет (Куприн)", text: `Я знаю, что я не могу быть с вами. Но я люблю вас. Я люблю вас так, как никто. Я не прошу ничего. Я просто хочу, чтобы вы знали. Я счастлив уже тем, что вы есть. Я пишу вам это письмо. Я не надеюсь на ответ. Я хочу, чтобы вы помнили обо мне. Я умру с мыслью о вас. Прощайте. Это было последнее письмо. Он умер. Она получила письмо. Она заплакала. Она поняла, что потеряла настоящую любовь. Она прочитала письмо ещё раз. Она посмотрела на браслет. Она вспомнила его лицо. Она поняла, что он был единственным, кто любил её по-настоящему. Она жалела, что не ответила ему. Но было поздно. Она осталась одна.` },
+        { id: "dark-alleys", title: "Тёмные аллеи", author: "И.А. Бунин", year: "1943", page: "Тёмные аллеи (Бунин)", text: `Он вспомнил свою молодость. Он вспомнил Надежду. Он понял, что потерял счастье. Он думал о том, что могло быть. Он жалел о прошлом. Он ехал в тарантасе. Он смотрел на поля. Он думал о своей жизни. Он понял, что она прошла мимо. Он хотел вернуть время назад. Но было поздно. Он заплакал. Он понял, что Надежда была его единственной любовью. Он потерял её навсегда. Он приехал на станцию. Он увидел её. Она была всё той же. Он понял, что всё ещё любит её. Но она не подошла к нему. Она только посмотрела. И он понял, что между ними всё кончено. Он уехал. И больше никогда не вернулся.` }
       ];
       const passageSelect = document.querySelector("#passage-select");
       const passageTitle = document.querySelector("#passage-title");
       const passageSource = document.querySelector("#passage-source");
-      let originalPassageWords = passages[0].text.trim().split(/\s+/u).slice(0, 100);
+      let originalPassageWords = passages[0].text.trim().split(/\s+/u);
       const lifetime = 8000;
       const targetWordCount = 33;
       let autoWordLimit = Number(autoWordLimitSelect.value);
@@ -659,7 +660,7 @@
       }
 
       function selectedWordCount() {
-        return selected.length;
+        return selected.filter((word) => !word.editable).length;
       }
 
       function manualWordInputs() {
@@ -667,28 +668,38 @@
       }
 
       function validManualWords() {
-        return manualWordInputs()
+        const editableWords = selected
+          .filter((word) => word.editable)
+          .map((word) => word.text.trim())
+          .filter((word) => countWords(word) === 1);
+        const wordsBeingEntered = manualWordInputs()
           .map((input) => input.value.trim())
           .filter((word) => countWords(word) === 1);
+        return [...editableWords, ...wordsBeingEntered];
       }
 
       function storyWordCount() {
-        return selectedWordCount() + validManualWords().length;
+        return selected.filter((word) => !word.editable).length + validManualWords().length;
       }
 
       function renderManualInputs() {
-        manualWords.replaceChildren();
-        const manualWordLimit = targetWordCount - autoWordLimit;
-        for (let index = 0; index < manualWordLimit; index++) {
+        const manualWordLimit = targetWordCount - autoWordLimit - selected.filter((word) => word.editable).length;
+        while (manualWords.children.length > manualWordLimit) {
+          manualWords.lastElementChild.remove();
+        }
+        while (manualWords.children.length < manualWordLimit) {
           const input = document.createElement("input");
           input.className = "manual-word";
           input.type = "text";
           input.autocomplete = "off";
           input.spellcheck = true;
-          input.placeholder = `Слово ${index + 1}`;
-          input.setAttribute("aria-label", `Своё слово ${index + 1} из ${manualWordLimit}`);
           manualWords.append(input);
         }
+        manualWordInputs().forEach((input, index) => {
+          const wordNumber = selected.filter((word) => word.editable).length + index + 1;
+          input.placeholder = `Слово ${wordNumber}`;
+          input.setAttribute("aria-label", `Своё слово ${wordNumber}`);
+        });
       }
 
       function wordForm(count) {
@@ -719,20 +730,23 @@
         const passage = passages.find((item) => item.id === id);
         if (!passage) return;
         activePassage = passage;
-        originalPassageWords = passage.text.trim().split(/\s+/u).slice(0, 100);
+        originalPassageWords = passage.text.trim().split(/\s+/u);
         passageTitle.textContent = `«${passage.title}»`;
         passageSource.textContent = `${passage.author} · ${passage.year}`;
         passageSource.href = `https://ru.wikisource.org/wiki/${encodeURIComponent(passage.page).replace(/%2F/gi, "/")}`;
         passageSelect.value = passage.id;
+        passageTotal.textContent = String(originalPassageWords.length);
+        passageProgress.setAttribute("aria-valuemax", String(Math.max(originalPassageWords.length - 33, 0)));
         resetPassage();
       }
 
       function updatePassageCount() {
         const remaining = passageWords.filter((word) => !word.removed).length;
         const removed = originalPassageWords.length - remaining;
+        const removable = Math.max(originalPassageWords.length - 33, 0);
         passageCount.textContent = String(remaining);
         passageProgress.setAttribute("aria-valuenow", String(removed));
-        passageProgressFill.style.width = `${(removed / 67) * 100}%`;
+        passageProgressFill.style.width = `${removable ? (removed / removable) * 100 : 0}%`;
         passageFinish.disabled = remaining !== 33;
         passageStatus.textContent = remaining === 33
           ? "Ровно 33 слова. Можно менять их порядок и завершать."
@@ -751,7 +765,7 @@
         passages.forEach((passage, index) => {
           const option = document.createElement("option");
           option.value = passage.id;
-          option.textContent = `${String(index + 1).padStart(2, "0")} · «${passage.title}» — ${passage.author}`;
+          option.textContent = `${String(index + 1).padStart(2, "0")} · «${passage.title}» — ${passage.author} · ${countWords(passage.text)} слов`;
           passageSelect.append(option);
         });
         passageSelect.value = activePassage.id;
@@ -802,14 +816,29 @@
           storyWords.append(placeholder);
         } else {
           selected.forEach((word, index) => {
-            const button = document.createElement("button");
-            button.className = `story-word${index === activeStoryIndex ? " is-active" : ""}`;
-            button.type = "button";
-            button.textContent = word;
-            button.setAttribute("aria-label", `Слово «${word}», позиция ${index + 1} из ${selected.length}. Используй стрелки, чтобы переставить`);
-            button.setAttribute("aria-pressed", String(index === activeStoryIndex));
-            button.dataset.index = String(index);
-            storyWords.append(button);
+            if (word.editable) {
+              const input = document.createElement("input");
+              input.className = "story-word custom-story-word";
+              input.type = "text";
+              input.disabled = finished;
+              input.autocomplete = "off";
+              input.spellcheck = true;
+              input.value = word.text;
+              input.size = Math.max(1, word.text.length);
+              input.dataset.index = String(index);
+              input.setAttribute("aria-label", `Своё слово, позиция ${index + 1} из ${selected.length}; можно редактировать`);
+              input.setAttribute("aria-invalid", String(countWords(word.text) !== 1));
+              storyWords.append(input);
+            } else {
+              const button = document.createElement("button");
+              button.className = `story-word${index === activeStoryIndex ? " is-active" : ""}`;
+              button.type = "button";
+              button.textContent = word.text;
+              button.setAttribute("aria-label", `Слово «${word.text}», позиция ${index + 1} из ${selected.length}. Используй стрелки, чтобы переставить`);
+              button.setAttribute("aria-pressed", String(index === activeStoryIndex));
+              button.dataset.index = String(index);
+              storyWords.append(button);
+            }
             if (index < selected.length - 1) storyWords.append(document.createTextNode(" "));
           });
         }
@@ -820,7 +849,8 @@
       function updateStoryCounts() {
         const count = storyWordCount();
         const autoCount = selectedWordCount();
-        const invalidManualInput = manualWordInputs().some((input) => countWords(input.value) > 1);
+        const invalidManualInput = selected.some((word) => word.editable && countWords(word.text) !== 1)
+          || manualWordInputs().some((input) => countWords(input.value) > 1);
         wordCount.querySelector("strong").textContent = String(count);
         wordCount.classList.toggle("complete", count === targetWordCount);
         fragmentCount.textContent = `${autoCount} / ${autoWordLimit} автоматически`;
@@ -844,7 +874,7 @@
         const wordWeight = countWords(falling[index].text);
         if (selectedWordCount() + wordWeight > autoWordLimit) return;
         const [word] = falling.splice(index, 1);
-        selected.push(...word.text.trim().split(/\s+/u));
+        selected.push(...word.text.trim().split(/\s+/u).map((text) => ({ text, editable: false })));
         activeStoryIndex = null;
         renderStory();
         updateSpawning();
@@ -969,6 +999,7 @@
         clearInterval(frameTimer);
         falling = [];
         selected = [];
+        manualWords.replaceChildren();
         renderManualInputs();
         activeStoryIndex = null;
         finished = false;
@@ -1060,7 +1091,7 @@
 
       storyPaper.addEventListener("click", (event) => {
         const button = event.target.closest(".story-word");
-        if (!button || finished || ignoreStoryClick) return;
+        if (!button || button.matches(".custom-story-word") || finished || ignoreStoryClick) return;
         const index = Number(button.dataset.index);
         if (activeStoryIndex === null) {
           activeStoryIndex = index;
@@ -1079,12 +1110,24 @@
         const button = event.target.closest(".story-word");
         if (!button || finished || (event.key !== "ArrowLeft" && event.key !== "ArrowRight")) return;
         const from = Number(button.dataset.index);
+        if (button.matches(".custom-story-word")) {
+          const atBoundary = event.key === "ArrowLeft"
+            ? button.selectionStart === 0 && button.selectionEnd === 0
+            : button.selectionStart === button.value.length && button.selectionEnd === button.value.length;
+          if (!atBoundary) return;
+        }
         const to = from + (event.key === "ArrowLeft" ? -1 : 1);
         if (to < 0 || to >= selected.length) return;
+        const selection = button.matches(".custom-story-word")
+          ? [button.selectionStart, button.selectionEnd]
+          : null;
         event.preventDefault();
         [selected[from], selected[to]] = [selected[to], selected[from]];
         activeStoryIndex = null;
         renderStory(to);
+        if (selection) {
+          storyWords.querySelector(`[data-index="${to}"]`)?.setSelectionRange(...selection);
+        }
       });
 
       storyPaper.addEventListener("pointerdown", (event) => {
@@ -1148,6 +1191,40 @@
         updateSpawning();
       });
 
+      function commitManualWord(input) {
+        const text = input.value.trim();
+        if (countWords(text) !== 1) return false;
+        input.remove();
+        const index = selected.push({ text, editable: true }) - 1;
+        renderStory(index);
+        renderManualInputs();
+        updateStoryCounts();
+        updateSpawning();
+        return true;
+      }
+
+      manualWords.addEventListener("change", (event) => {
+        const input = event.target.closest(".manual-word");
+        if (input) commitManualWord(input);
+      });
+
+      manualWords.addEventListener("keydown", (event) => {
+        const input = event.target.closest(".manual-word");
+        if (!input || event.key !== "Enter") return;
+        event.preventDefault();
+        commitManualWord(input);
+      });
+
+      storyWords.addEventListener("input", (event) => {
+        const input = event.target.closest(".custom-story-word");
+        if (!input) return;
+        const word = selected[Number(input.dataset.index)];
+        word.text = input.value;
+        input.size = Math.max(1, input.value.length);
+        input.setAttribute("aria-invalid", String(countWords(input.value) !== 1));
+        updateStoryCounts();
+      });
+
       document.addEventListener("keydown", (event) => {
         if (modal.hidden && !event.target.closest("input, textarea, select, [contenteditable='true']") && /^[1-6]$/.test(event.key) && !event.ctrlKey && !event.metaKey && !event.altKey) {
           const visibleWords = [...board.querySelectorAll(".falling-word")];
@@ -1178,13 +1255,16 @@
         if (event.target === passageModal) passageModal.hidden = true;
       });
       finishButton.addEventListener("click", () => {
+        manualWordInputs().forEach((input) => {
+          if (countWords(input.value) === 1) commitManualWord(input);
+        });
         if (storyWordCount() !== targetWordCount || selectedWordCount() !== autoWordLimit) return;
         finished = true;
         clearInterval(spawnTimer);
         clearInterval(frameTimer);
         falling = [];
         renderBoard(performance.now());
-        finalStory.textContent = [...selected, ...validManualWords()].join(" ");
+        finalStory.textContent = selected.map((word) => word.text.trim()).filter(Boolean).join(" ");
         renderStory();
         modal.hidden = false;
         modalClose.focus();
@@ -1196,8 +1276,8 @@
       window.addEventListener("resize", () => renderBoard(performance.now()));
       if (new Set(words).size !== words.length) throw new Error("The word deck must not contain repeated phrases");
       if (![10, 20, 30].includes(autoWordLimit)) throw new Error("The automatic word limit must be 10, 20, or 30");
-      if (passages.length !== 20 || passages.some((passage) => passage.text.trim().split(/\s+/u).length < 100)) {
-        throw new Error("The excerpt catalog must contain 20 texts with at least 100 words each");
+      if (passages.length !== 10 || passages.some((passage) => !passage.text.trim())) {
+        throw new Error("The excerpt catalog must contain 10 non-empty texts");
       }
       populatePassages();
       renderPassage();
