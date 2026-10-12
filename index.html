@@ -204,6 +204,36 @@
     .quiet-button:hover { color: var(--ink); }
 
     .level-two-layout { grid-template-columns: minmax(0, 1.5fr) minmax(245px, .65fr); }
+    .passage-modes { display: flex; grid-column: 1 / -1; gap: 8px; }
+    .passage-mode-button {
+      min-height: 40px;
+      padding: 0 13px;
+      border: 1px solid var(--line);
+      background: var(--white);
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 11px;
+    }
+    .passage-mode-button[aria-pressed="true"] { border-color: var(--green); background: var(--green); color: var(--white); }
+    .prehistory-panel { grid-column: 1 / -1; padding: 23px; border: 1px solid var(--line); background: var(--white); }
+    .prehistory-panel h2 { margin: 7px 0 0; font-family: var(--serif); font-size: 25px; font-weight: 500; }
+    .prehistory-note { margin: 8px 0 14px; color: var(--muted); font-size: 12px; line-height: 1.6; }
+    .prehistory-input {
+      display: block;
+      width: 100%;
+      min-height: 220px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 0;
+      background: #f8f5ec;
+      color: var(--ink);
+      font-family: var(--serif);
+      font-size: 16px;
+      line-height: 1.8;
+      resize: vertical;
+    }
+    .prehistory-input:focus-visible { outline: 2px solid var(--coral); outline-offset: 2px; }
+    .prehistory-count { margin: 9px 0 0; color: var(--muted); font-family: var(--mono); font-size: 11px; text-align: right; }
     .passage-panel { min-width: 0; padding: 23px; border: 1px solid var(--line); background: var(--white); }
     .passage-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
     .passage-heading h2 { margin: 7px 0 0; font-family: var(--serif); font-size: 25px; font-weight: 500; }
@@ -459,7 +489,7 @@
 
       <nav class="levels" aria-label="Уровни игры">
         <button class="level active" id="level-one-button" type="button" aria-current="step"><span class="level-number">01</span><span>Рассказ</span></button>
-        <button class="level" id="level-two-button" type="button"><span class="level-number">02</span><span>Сокращение</span></button>
+        <button class="level" id="level-two-button" type="button"><span class="level-number">02</span><span>Режимы</span></button>
         <div class="level soon" aria-label="Уровень 3, скоро"><span class="level-number">03</span><span>Уровень 3</span><span class="level-tag">скоро</span></div>
       </nav>
 
@@ -506,8 +536,20 @@
           </div>
         </div>
       </section>
-      <section class="game-layout level-two-layout" id="level-two" aria-label="Второй уровень: сокращение отрывка до 33 слов" hidden>
-        <div class="passage-panel">
+      <section class="game-layout level-two-layout" id="level-two" aria-label="Второй уровень: дописать предысторию или сократить рассказ" hidden>
+        <nav class="passage-modes" aria-label="Режим второго уровня">
+          <button class="passage-mode-button" id="prehistory-mode-button" type="button" aria-controls="prehistory-mode" aria-pressed="true">Допиши предысторию</button>
+          <button class="passage-mode-button" id="shorten-mode-button" type="button" aria-controls="passage-panel" aria-pressed="false">Сократи рассказ</button>
+        </nav>
+        <section class="prehistory-panel" id="prehistory-mode" aria-labelledby="prehistory-title">
+          <span class="label">Твоя история</span>
+          <h2 id="prehistory-title">Допиши предысторию</h2>
+          <p class="prehistory-note">Придумай, что произошло до начала рассказа. В предыстории может быть не больше 33 слов.</p>
+          <label class="label" for="prehistory-input">Предыстория</label>
+          <textarea class="prehistory-input" id="prehistory-input" aria-describedby="prehistory-count" placeholder="Напиши свою предысторию…"></textarea>
+          <p class="prehistory-count" id="prehistory-count" aria-live="polite">0 / 33 слов</p>
+        </section>
+        <div class="passage-panel" id="passage-panel">
           <div class="passage-heading">
             <div>
               <span class="label">Отрывок классика</span>
@@ -531,7 +573,7 @@
           <p class="passage-status" id="passage-status" aria-live="polite">Убери 67 слов. Оставшиеся можно переставить.</p>
           <button class="finish-button" id="passage-finish" type="button" disabled>Завершить сокращение</button>
           <button class="quiet-button" id="passage-reset" type="button">Вернуть исходный отрывок</button>
-          <p class="passage-credit">20 классических произведений · каждый отрывок начинается с оригинального текста.</p>
+          <p class="passage-credit">10 рассказов · каждый можно сократить до 33 слов.</p>
         </aside>
       </section>
       <div class="footer-note"><span>Одна история · 33 слова</span><span>Слова исчезают — твой шанс нет</span></div>
@@ -619,6 +661,11 @@
       const passageFinish = document.querySelector("#passage-finish");
       const passageModal = document.querySelector("#passage-modal");
       const passageResult = document.querySelector("#passage-result");
+      const prehistoryModeButton = document.querySelector("#prehistory-mode-button");
+      const shortenModeButton = document.querySelector("#shorten-mode-button");
+      const prehistoryMode = document.querySelector("#prehistory-mode");
+      const prehistoryInput = document.querySelector("#prehistory-input");
+      const prehistoryCount = document.querySelector("#prehistory-count");
       const passages = [
         { id: "queen-spades", title: "Пиковая дама", author: "А.С. Пушкин", year: "1834", page: "Пиковая дама (Пушкин)", text: `Германн ночью пробрался в дом графини. Он поднялся по лестнице и вошёл в её комнату. Там было темно. Он зажёг свечу и увидел портрет. Он стал ждать. Вскоре послышались шаги. Германн спрятался за ширмы. Вошла графиня. Она начала раздеваться. Германн смотрел на неё и думал о том, что ему нужно. Он вышел из-за ширм. Графиня испугалась. Он сказал ей, что ему нужно. Она молчала. Он показал пистолет. Графиня умерла от страха. Германн остался один. Он понял, что убил человека. Он не знал, что делать дальше. Он вышел из дома и пошёл куда глаза глядят. Он думал о том, что теперь его жизнь кончена. Он не мог вернуться назад. Он шёл всю ночь. К утру он оказался у дома Лизаветы Ивановны. Он не знал, зачем пришёл. Он стоял и смотрел на окна. Потом повернулся и ушёл.` },
         { id: "dead-souls", title: "Мёртвые души", author: "Н.В. Гоголь", year: "1842", page: "Мёртвые души (Гоголь)", text: `Чичиков подъехал к дому Плюшкина. Дом выглядел заброшенным. Он вошёл во двор и увидел странного человека. Тот был в старом халате и походил на нищего. Чичиков долго не мог понять, кто это. Плюшкин пригласил его в дом. Внутри было грязно и темно. На стенах висели старые картины. В углу лежала куча хлама. Чичиков предложил купить мёртвые души. Плюшкин обрадовался и согласился. Он продал души и был очень доволен. Чичиков уехал, а Плюшкин остался один в своём запущенном доме. Он долго смотрел вслед телеге. Потом вернулся в дом и сел в кресло. Он думал о том, что теперь у него есть деньги. Он был счастлив. Но через минуту он снова стал жадничать. Он жалел, что продал души так дешево.` },
@@ -654,6 +701,7 @@
       let ignoreStoryClick = false;
       let pointerDrag = null;
       let ignoreTokenClick = false;
+      let activePassageMode = "prehistory";
 
       function countWords(text) {
         return text.trim() ? text.trim().split(/\s+/u).length : 0;
@@ -755,6 +803,25 @@
             : `Верни ${33 - remaining} ${wordForm(33 - remaining)}, чтобы получилось ровно 33.`;
       }
 
+      function switchPassageMode(mode) {
+        const isPrehistory = mode === "prehistory";
+        activePassageMode = mode;
+        prehistoryMode.hidden = !isPrehistory;
+        document.querySelector("#passage-panel").hidden = isPrehistory;
+        document.querySelector(".passage-sidebar").hidden = isPrehistory;
+        prehistoryModeButton.setAttribute("aria-pressed", String(isPrehistory));
+        shortenModeButton.setAttribute("aria-pressed", String(!isPrehistory));
+      }
+
+      function updatePrehistoryCount() {
+        let enteredWords = prehistoryInput.value.trim().split(/\s+/u).filter(Boolean);
+        if (enteredWords.length > 33) {
+          enteredWords = enteredWords.slice(0, 33);
+          prehistoryInput.value = enteredWords.join(" ");
+        }
+        prehistoryCount.textContent = `${enteredWords.length} / 33 слов`;
+      }
+
       function resetPassage() {
         passageWords = originalPassageWords.map((text) => ({ text, removed: false }));
         passageModal.hidden = true;
@@ -792,7 +859,7 @@
           firstLevelView.hidden = true;
           secondLevelView.hidden = false;
           pageEyebrow.textContent = "Три уровня · уровень второй";
-          pageSubtitle.textContent = "Сократи отрывок классика до 33 слов. Сохрани смысл и найди свой порядок.";
+          pageSubtitle.textContent = "Выбери режим: допиши предысторию или сократи рассказ до 33 слов.";
           renderPassage();
         }
         activeLevel = level;
@@ -1237,6 +1304,9 @@
 
       firstLevelButton.addEventListener("click", () => switchLevel(1));
       secondLevelButton.addEventListener("click", () => switchLevel(2));
+      prehistoryModeButton.addEventListener("click", () => switchPassageMode("prehistory"));
+      shortenModeButton.addEventListener("click", () => switchPassageMode("shorten"));
+      prehistoryInput.addEventListener("input", updatePrehistoryCount);
       document.querySelector("#restart-button").addEventListener("click", restart);
       autoWordLimitSelect.addEventListener("change", () => {
         autoWordLimit = Number(autoWordLimitSelect.value);
@@ -1279,6 +1349,7 @@
       if (passages.length !== 10 || passages.some((passage) => !passage.text.trim())) {
         throw new Error("The excerpt catalog must contain 10 non-empty texts");
       }
+      switchPassageMode(activePassageMode);
       populatePassages();
       renderPassage();
       restart();
