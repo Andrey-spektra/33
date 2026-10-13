@@ -443,6 +443,7 @@
       user-select: text;
       -webkit-user-select: text;
     }
+    .story-paper.is-dragging .story-word.custom-story-word { user-select: none; -webkit-user-select: none; }
     .story-word.custom-story-word[aria-invalid="true"] { border-bottom-color: #b84b3b; background: #f8dfd5; }
     .auto-word-select-label {
       display: flex;
@@ -1850,6 +1851,10 @@
           startY: event.clientY,
           started: false
         };
+      });
+
+      storyPaper.addEventListener("dragstart", (event) => {
+        if (event.target.closest(".custom-story-word")) event.preventDefault();
       });
 
       document.addEventListener("pointermove", (event) => {
