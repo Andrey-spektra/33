@@ -73,7 +73,6 @@
       cursor: pointer;
       font-size: 0;
     }
-    .launcher-button:hover { filter: brightness(1.15); }
     .launcher-button:focus-visible { outline: 3px solid #fff1c7; outline-offset: -5px; }
     .mode-menu { width: min(1240px, 100%); }
     .mode-menu h2 { margin: 10px 0 26px; color: #fff5d8; font-family: var(--serif); font-size: clamp(30px, 5vw, 48px); font-weight: 500; }
@@ -91,13 +90,13 @@
       text-align: left;
       transition: transform 150ms ease, border-color 150ms ease;
     }
-    .mode-card:hover, .mode-card:focus-visible { border-color: #fff1c7; outline: 3px solid rgb(255 241 199 / 48%); outline-offset: 2px; transform: translateY(-3px); }
+    .mode-card:focus-visible { border-color: #fff1c7; outline: 3px solid rgb(255 241 199 / 48%); outline-offset: 2px; transform: translateY(-3px); }
     .mode-card img { display: block; width: 100%; aspect-ratio: 3 / 2; object-fit: cover; }
     .mode-card-copy { display: grid; gap: 7px; padding: 16px; }
     .mode-card-copy strong { color: #fff1c7; font-family: var(--serif); font-size: 23px; font-weight: 600; }
     .mode-card-copy span { color: #e7e5df; font-size: 13px; line-height: 1.55; }
     .sections-button { padding: 6px 0 6px 10px; border: 0; background: transparent; color: #60736b; cursor: pointer; font-size: 11px; text-decoration: underline; text-underline-offset: 3px; }
-    .sections-button:hover, .sections-button:focus-visible { color: var(--ink); }
+    .sections-button:focus-visible { color: var(--ink); }
     .page { width: min(1180px, calc(100% - 64px)); margin: 0 auto; }
     .topbar {
       min-height: 76px;
@@ -109,8 +108,8 @@
     .wordmark { display: flex; align-items: center; gap: 12px; }
     .mark {
       display: block;
-      width: 52px;
-      height: 52px;
+      width: 60px;
+      height: 60px;
       object-fit: contain;
     }
     .brand { font-size: 15px; font-weight: 700; letter-spacing: 0; }
@@ -239,7 +238,7 @@
     }
     .falling-word:nth-of-type(3n) { background: #f2d88c; }
     .falling-word:nth-of-type(5n) { background: #f29c7c; }
-    .falling-word:hover, .falling-word:focus-visible { z-index: 2; border-color: white; background: white; outline: 2px solid var(--lime); }
+    .falling-word:focus-visible { z-index: 2; border-color: white; background: white; outline: 2px solid var(--lime); }
     .falling-word:disabled { cursor: not-allowed; opacity: .55; }
     .word-life { position: absolute; right: 0; bottom: 0; left: 0; height: 3px; background: rgb(24 52 47 / 19%); }
     .word-life span { display: block; height: 100%; background: var(--coral); transform-origin: left; }
@@ -258,7 +257,6 @@
       text-decoration-color: #b6bdb2;
       text-underline-offset: 3px;
     }
-    .quiet-button:hover { color: var(--ink); }
 
     .level-two-layout { grid-template-columns: minmax(0, 1.5fr) minmax(245px, .65fr); }
     .prehistory-panel { grid-column: 1 / -1; padding: 23px; border: 1px solid var(--line); background: var(--white); }
@@ -323,9 +321,9 @@
       user-select: none;
       -webkit-user-select: none;
     }
-    .word-token:hover, .word-token:focus-visible { border-bottom-color: var(--green); background: #e8eccf; outline: none; }
+    .word-token:focus-visible { border-bottom-color: var(--green); background: #e8eccf; outline: none; }
     .word-token.is-removed { color: #96978b; opacity: .65; text-decoration: line-through; text-decoration-color: var(--coral); text-decoration-thickness: 1.5px; }
-    .word-token.is-removed:hover, .word-token.is-removed:focus-visible { color: #596c64; opacity: 1; }
+    .word-token.is-removed:focus-visible { color: #596c64; opacity: 1; }
     .word-token.is-dragging { opacity: .32; }
     .word-token.drop-target { border-bottom-color: var(--coral); background: #f8dfd5; }
     .passage-controls { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 13px; }
@@ -341,9 +339,7 @@
     .passage-status { min-height: 42px; margin: 14px 0 0; color: #e5ebe6; font-size: 11px; line-height: 1.6; }
     .passage-sidebar .finish-button { margin-top: auto; }
     .passage-sidebar .finish-button:disabled { background: #48675e; color: #b8c4bd; }
-    .passage-sidebar .finish-button:not(:disabled):hover { background: #316b57; }
     .passage-sidebar .quiet-button { align-self: flex-start; margin: 7px 0 0; color: #d0ddd4; text-decoration-color: #799389; }
-    .passage-sidebar .quiet-button:hover { color: white; }
     .passage-credit { margin: 14px 0 0; color: #afc2b7; font-family: var(--mono); font-size: 9px; line-height: 1.6; }
     .level-two-layout[hidden], .game-layout[hidden] { display: none; }
     .level-three-layout { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(270px, .75fr); gap: 18px; align-items: start; }
@@ -356,7 +352,6 @@
     .hidden-object-image-error { position: absolute; z-index: 2; inset: auto 8px 8px; margin: 0; padding: 8px; background: var(--white); color: #a33d30; font-size: 12px; text-align: center; }
     .hidden-object-image-error[hidden] { display: none; }
     .anomaly-hotspot { position: absolute; z-index: 1; padding: 0; border: 1px solid transparent; border-radius: 50%; background: transparent; cursor: pointer; }
-    .anomaly-hotspot:hover, .anomaly-hotspot:focus-visible { border-color: var(--lime); background: rgb(213 237 116 / 16%); outline: 2px solid var(--lime); outline-offset: 1px; }
     .anomaly-hotspot.is-found { border-color: var(--lime); background: rgb(213 237 116 / 43%); }
     .anomaly-hotspot.is-found::after { position: absolute; top: 50%; left: 50%; color: var(--ink); font-size: 17px; font-weight: 700; content: "✓"; transform: translate(-50%, -50%); }
     .hidden-object-progress, .third-story-count { margin: 0 0 12px; color: var(--muted); font-family: var(--mono); font-size: 11px; }
@@ -364,7 +359,7 @@
     .anomaly-word-group h3 { margin: 0 0 8px; color: var(--ink); font-family: var(--serif); font-size: 16px; font-weight: 500; }
     .anomaly-word-options { display: flex; flex-wrap: wrap; gap: 7px; }
     .anomaly-word-option { min-height: 34px; padding: 0 10px; border: 1px solid var(--line); background: var(--paper); color: var(--ink); cursor: pointer; font-size: 12px; }
-    .anomaly-word-option:hover:not(:disabled), .anomaly-word-option:focus-visible { border-color: var(--green); outline: 2px solid var(--lime); }
+    .anomaly-word-option:focus-visible { border-color: var(--green); outline: 2px solid var(--lime); }
     .anomaly-word-option[aria-pressed="true"] { border-color: var(--green); background: var(--green); color: white; }
     .anomaly-word-option:disabled { cursor: not-allowed; opacity: .58; }
     .third-discovery { display: grid; grid-column: 1 / -1; grid-template-columns: minmax(0, 1.5fr) minmax(270px, .75fr); gap: 18px; align-items: start; }
@@ -432,7 +427,6 @@
       user-select: none;
       -webkit-user-select: none;
     }
-    .story-word:hover { border-bottom-color: var(--coral); color: #a54d3d; }
     .story-word.is-active { background: var(--lime); color: var(--ink); }
     .story-word.is-dragging { opacity: .32; }
     .story-word.drop-target { border-bottom-color: var(--coral); background: #f8dfd5; }
@@ -505,7 +499,6 @@
       transition: background-color 150ms ease, transform 150ms ease;
     }
     .finish-button:disabled { background: #c5c7bb; color: #838b80; cursor: not-allowed; }
-    .finish-button:not(:disabled):hover { background: #28705e; transform: translateY(-1px); }
 
     .modal-backdrop {
       position: fixed;
@@ -607,7 +600,6 @@
     .falling-word { border-color: rgb(244 220 153 / 65%); background: #f2dc9e; color: #102a3e; font-size: 15px; font-weight: 600; }
     .falling-word:nth-of-type(3n) { background: #fff1c7; }
     .falling-word:nth-of-type(5n) { background: #e9b56f; }
-    .falling-word:hover, .falling-word:focus-visible { border-color: white; background: white; outline-color: #f2dc9e; }
     .story-paper, .third-story-paper {
       border-left-color: #e5c778;
       background-color: #102c43;
@@ -615,7 +607,6 @@
     }
     .story-placeholder { color: #bac7cc; }
     .story-word { color: #fff1c7; font-size: 15px; }
-    .story-word:hover { border-bottom-color: #f2dc9e; color: white; }
     .story-word.is-active { background: #f2dc9e; color: #102a3e; }
     .story-word.drop-target, .third-story-token.drop-target { border-bottom-color: #f2dc9e; background: #38536a; }
     .story-word.custom-story-word[aria-invalid="true"], .manual-word[aria-invalid="true"] { border-bottom-color: #ff9c84; background: #512f39; }
@@ -646,7 +637,7 @@
       background-image: repeating-linear-gradient(to bottom, transparent 0, transparent 35px, rgb(229 199 120 / 14%) 35px, rgb(229 199 120 / 14%) 36px);
       color: #fff8e6;
     }
-    .word-token:hover, .word-token:focus-visible { border-bottom-color: #f2dc9e; background: #38536a; color: white; }
+    .word-token:focus-visible { border-bottom-color: #f2dc9e; background: #38536a; color: white; }
     .word-token:focus-visible { outline: 2px solid #f2dc9e; outline-offset: 2px; }
     .word-token.is-removed { color: #aeb8bc; text-decoration-color: #ff9c84; }
     .word-token.drop-target { border-bottom-color: #f2dc9e; background: #38536a; }
@@ -663,14 +654,12 @@
       color: #fff8e6;
       font-size: 14px;
     }
-    .anomaly-word-option:hover:not(:disabled), .anomaly-word-option:focus-visible {
+    .anomaly-word-option:focus-visible {
       border-color: #f2dc9e;
-      background: #1d3b52;
       outline: 2px solid #f2dc9e;
       outline-offset: 1px;
     }
     .anomaly-word-option[aria-pressed="true"] { border-color: #f2dc9e; background: #f2dc9e; color: #102a3e; }
-    .anomaly-hotspot:hover, .anomaly-hotspot:focus-visible { border-color: #fff1c7; background: rgb(242 220 158 / 24%); outline-color: #fff1c7; }
     .anomaly-hotspot.is-found { border-color: #fff1c7; background: rgb(242 220 158 / 48%); }
     .anomaly-hotspot.is-found::after { color: #102a3e; }
     .third-start-panel { border-color: rgb(244 220 153 / 40%); background: #102c43; }
@@ -691,7 +680,6 @@
       text-decoration: none;
       transition: background-color 150ms ease, box-shadow 150ms ease, transform 150ms ease;
     }
-    .finish-button:not(:disabled):hover, .sections-button:hover { background: #fff1c7; box-shadow: 0 6px 18px rgb(0 0 0 / 22%); transform: translateY(-1px); }
     .finish-button:focus-visible, .sections-button:focus-visible, .quiet-button:focus-visible,
     .anomaly-word-option:focus-visible, .level:focus-visible, .falling-word:focus-visible {
       outline: 3px solid white;
@@ -709,7 +697,6 @@
       font-weight: 600;
       text-decoration-color: #e5d6a9;
     }
-    .quiet-button:hover, .passage-sidebar .quiet-button:hover { background: #1d3b52; color: white; }
     .sections-button { min-height: 46px; }
     .level { min-height: 48px; border-color: rgb(244 220 153 / 42%); background: #102c43; color: #e5d6a9; font-size: 13px; }
     .level.active { border-color: #f2dc9e; background: #f2dc9e; color: #102a3e; }
@@ -756,10 +743,6 @@
     .page .level { min-height: 64px; padding: 4px clamp(10px, 1.5vw, 18px); }
     .page .finish-button { min-height: 64px; padding: 6px clamp(18px, 3vw, 30px); }
     .page .quiet-button { min-height: 58px; padding: 5px clamp(18px, 3vw, 30px); }
-    .page .sections-button:hover,
-    .page .level:hover,
-    .page .finish-button:not(:disabled):hover,
-    .page .quiet-button:hover { filter: brightness(1.18); }
     .page .sections-button:focus-visible,
     .page .level:focus-visible,
     .page .finish-button:focus-visible,
@@ -895,7 +878,7 @@
           <div class="passage-progress" id="passage-progress" role="progressbar" aria-label="Сколько лишних слов убрано" aria-valuemin="0" aria-valuemax="67" aria-valuenow="0"><span id="passage-progress-fill"></span></div>
           <p class="passage-status" id="passage-status" aria-live="polite">Убери 67 слов. Оставшиеся можно переставить.</p>
           <button class="finish-button" id="passage-finish" type="button" disabled>Завершить сокращение</button>
-          <button class="quiet-button" id="passage-reset" type="button">Вернуть исходный отрывок</button>
+          <button class="quiet-button" id="passage-reset" type="button">Исходный текст</button>
           <p class="passage-credit">10 рассказов · каждый можно сократить до 33 слов.</p>
         </aside>
       </section>
@@ -933,7 +916,7 @@
           <p class="story-note">Перетаскивай слова или переставляй их стрелками. Заполни 23 пустых поля — по одному слову в каждое.</p>
           <div class="story-paper third-story-paper" id="third-story-paper" aria-label="Рассказ из выбранных и своих слов"></div>
           <div class="third-story-footer">
-            <button class="quiet-button" id="third-change-words" type="button">Вернуться к выбору слов</button>
+            <button class="quiet-button" id="third-change-words" type="button">Назад</button>
             <button class="finish-button" id="third-finish-button" type="button" disabled>Завершить рассказ</button>
           </div>
         </section>
@@ -1787,7 +1770,14 @@
         passageEditor.querySelectorAll(".is-dragging, .drop-target").forEach((token) => token.classList.remove("is-dragging", "drop-target"));
       });
 
+      board.addEventListener("pointerdown", (event) => {
+        if (event.button !== 0 || !event.isPrimary) return;
+        const button = event.target.closest(".falling-word");
+        if (button && !button.disabled) chooseWord(Number(button.dataset.id));
+      });
+
       board.addEventListener("click", (event) => {
+        if (event.detail !== 0) return;
         const button = event.target.closest(".falling-word");
         if (button) chooseWord(Number(button.dataset.id));
       });
