@@ -188,6 +188,7 @@
     .word-life { position: absolute; right: 0; bottom: 0; left: 0; height: 3px; background: rgb(24 52 47 / 19%); }
     .word-life span { display: block; height: 100%; background: var(--coral); transform-origin: left; }
     .board-actions { display: flex; min-height: 49px; align-items: center; justify-content: space-between; gap: 12px; }
+    .board-action-buttons { display: flex; align-items: center; gap: 14px; }
     .hint { margin: 0; color: var(--muted); font-size: 11px; }
     .hint kbd { padding: 2px 5px; border: 1px solid var(--line); background: var(--paper); font-family: var(--mono); font-size: 9px; }
     .quiet-button {
@@ -204,17 +205,6 @@
     .quiet-button:hover { color: var(--ink); }
 
     .level-two-layout { grid-template-columns: minmax(0, 1.5fr) minmax(245px, .65fr); }
-    .passage-modes { display: flex; grid-column: 1 / -1; gap: 8px; }
-    .passage-mode-button {
-      min-height: 40px;
-      padding: 0 13px;
-      border: 1px solid var(--line);
-      background: var(--white);
-      color: var(--muted);
-      cursor: pointer;
-      font-size: 11px;
-    }
-    .passage-mode-button[aria-pressed="true"] { border-color: var(--green); background: var(--green); color: var(--white); }
     .prehistory-panel { grid-column: 1 / -1; padding: 23px; border: 1px solid var(--line); background: var(--white); }
     .prehistory-panel h2 { margin: 7px 0 0; font-family: var(--serif); font-size: 25px; font-weight: 500; }
     .prehistory-note { margin: 8px 0 14px; color: var(--muted); font-size: 12px; line-height: 1.6; }
@@ -463,7 +453,9 @@
       .level { min-height: 40px; gap: 6px; padding: 0 8px; font-size: 10px; }
       .board { height: 340px; }
       .story-footer { grid-template-columns: 1fr; }
+      .board-actions { flex-wrap: wrap; }
       .finish-button { width: 100%; }
+      .board-action-buttons .finish-button { width: auto; }
       .passage-heading h2 { font-size: 21px; }
       .passage-controls { align-items: flex-start; }
     }
@@ -489,7 +481,7 @@
 
       <nav class="levels" aria-label="Уровни игры">
         <button class="level active" id="level-one-button" type="button" aria-current="step"><span class="level-number">01</span><span>Рассказ</span></button>
-        <button class="level" id="level-two-button" type="button"><span class="level-number">02</span><span>Режимы</span></button>
+        <button class="level" id="level-two-button" type="button"><span class="level-number">02</span><span>История</span></button>
         <div class="level soon" aria-label="Уровень 3, скоро"><span class="level-number">03</span><span>Уровень 3</span><span class="level-tag">скоро</span></div>
       </nav>
 
@@ -505,7 +497,10 @@
           </div>
           <div class="board-actions">
             <p class="hint">Лови слова и фразы: <kbd>клик</kbd> или <kbd>1–6</kbd></p>
-            <button class="quiet-button" id="restart-button" type="button">Начать заново</button>
+            <div class="board-action-buttons">
+              <button class="finish-button" id="start-game-button" type="button">Начать игру</button>
+              <button class="quiet-button" id="restart-button" type="button" hidden>Начать заново</button>
+            </div>
           </div>
         </div>
 
@@ -536,11 +531,7 @@
           </div>
         </div>
       </section>
-      <section class="game-layout level-two-layout" id="level-two" aria-label="Второй уровень: дописать предысторию или сократить рассказ" hidden>
-        <nav class="passage-modes" aria-label="Режим второго уровня">
-          <button class="passage-mode-button" id="prehistory-mode-button" type="button" aria-controls="prehistory-mode" aria-pressed="true">Допиши предысторию</button>
-          <button class="passage-mode-button" id="shorten-mode-button" type="button" aria-controls="passage-panel" aria-pressed="false">Сократи рассказ</button>
-        </nav>
+      <section class="game-layout level-two-layout" id="level-two" aria-label="Второй уровень: предыстория и сокращение рассказа" hidden>
         <section class="prehistory-panel" id="prehistory-mode" aria-labelledby="prehistory-title">
           <span class="label">Твоя история</span>
           <h2 id="prehistory-title">Допиши предысторию</h2>
@@ -633,6 +624,8 @@
       ];
       const board = document.querySelector("#board");
       const boardEmpty = document.querySelector("#board-empty");
+      const startGameButton = document.querySelector("#start-game-button");
+      const restartButton = document.querySelector("#restart-button");
       const storyPaper = document.querySelector("#story-paper");
       const storyWords = document.querySelector("#story-words");
       const manualWords = document.querySelector("#manual-words");
@@ -661,9 +654,6 @@
       const passageFinish = document.querySelector("#passage-finish");
       const passageModal = document.querySelector("#passage-modal");
       const passageResult = document.querySelector("#passage-result");
-      const prehistoryModeButton = document.querySelector("#prehistory-mode-button");
-      const shortenModeButton = document.querySelector("#shorten-mode-button");
-      const prehistoryMode = document.querySelector("#prehistory-mode");
       const prehistoryInput = document.querySelector("#prehistory-input");
       const prehistoryCount = document.querySelector("#prehistory-count");
       const passages = [
@@ -695,13 +685,13 @@
       let frameTimer;
       let finished = false;
       let activeLevel = 1;
+      let firstLevelStarted = false;
       let firstLevelPausedAt = null;
       let activeStoryIndex = null;
       let storyDrag = null;
       let ignoreStoryClick = false;
       let pointerDrag = null;
       let ignoreTokenClick = false;
-      let activePassageMode = "prehistory";
 
       function countWords(text) {
         return text.trim() ? text.trim().split(/\s+/u).length : 0;
@@ -803,16 +793,6 @@
             : `Верни ${33 - remaining} ${wordForm(33 - remaining)}, чтобы получилось ровно 33.`;
       }
 
-      function switchPassageMode(mode) {
-        const isPrehistory = mode === "prehistory";
-        activePassageMode = mode;
-        prehistoryMode.hidden = !isPrehistory;
-        document.querySelector("#passage-panel").hidden = isPrehistory;
-        document.querySelector(".passage-sidebar").hidden = isPrehistory;
-        prehistoryModeButton.setAttribute("aria-pressed", String(isPrehistory));
-        shortenModeButton.setAttribute("aria-pressed", String(!isPrehistory));
-      }
-
       function updatePrehistoryCount() {
         let enteredWords = prehistoryInput.value.trim().split(/\s+/u).filter(Boolean);
         if (enteredWords.length > 33) {
@@ -843,23 +823,27 @@
         if (level === activeLevel) return;
         const isFirstLevel = level === 1;
         if (isFirstLevel) {
-          const pausedFor = performance.now() - firstLevelPausedAt;
-          falling.forEach((word) => { word.born += pausedFor; });
+          if (firstLevelStarted && firstLevelPausedAt !== null) {
+            const pausedFor = performance.now() - firstLevelPausedAt;
+            falling.forEach((word) => { word.born += pausedFor; });
+          }
           firstLevelView.hidden = false;
           secondLevelView.hidden = true;
           pageEyebrow.textContent = "Три уровня · уровень первый";
           pageSubtitle.textContent = "Лови слова и фразы, затем дополни рассказ своими словами до 33.";
-          renderBoard(performance.now());
-          startFirstLevelTimers();
+          if (firstLevelStarted) {
+            renderBoard(performance.now());
+            startFirstLevelTimers();
+          }
           firstLevelPausedAt = null;
         } else {
           clearInterval(spawnTimer);
           clearInterval(frameTimer);
-          firstLevelPausedAt = performance.now();
+          firstLevelPausedAt = firstLevelStarted ? performance.now() : null;
           firstLevelView.hidden = true;
           secondLevelView.hidden = false;
           pageEyebrow.textContent = "Три уровня · уровень второй";
-          pageSubtitle.textContent = "Выбери режим: допиши предысторию или сократи рассказ до 33 слов.";
+          pageSubtitle.textContent = "Допиши предысторию и сократи рассказ до 33 слов.";
           renderPassage();
         }
         activeLevel = level;
@@ -997,6 +981,7 @@
       }
 
       function startFirstLevelTimers() {
+        if (!firstLevelStarted) return;
         clearInterval(spawnTimer);
         clearInterval(frameTimer);
         spawnTimer = null;
@@ -1006,6 +991,7 @@
 
       function updateSpawning() {
         const canSpawn = !finished
+          && firstLevelStarted
           && selectedWordCount() < autoWordLimit
           && wordDeck.length > 0;
         if (canSpawn && spawnTimer === null) {
@@ -1073,10 +1059,24 @@
         firstLevelPausedAt = null;
         modal.hidden = true;
         board.querySelectorAll(".falling-word").forEach((node) => node.remove());
-        boardEmpty.textContent = "Ждём первое слово…";
+        boardEmpty.textContent = firstLevelStarted
+          ? "Нажми «Начать заново», чтобы начать новую историю."
+          : "Нажми «Начать игру», чтобы запустить слова.";
         boardEmpty.hidden = false;
         shuffleWordDeck();
         renderStory();
+        if (firstLevelStarted) {
+          spawnWord();
+          renderBoard(performance.now());
+          startFirstLevelTimers();
+        }
+      }
+
+      function startGame() {
+        if (firstLevelStarted) return;
+        firstLevelStarted = true;
+        startGameButton.hidden = true;
+        restartButton.hidden = false;
         spawnWord();
         renderBoard(performance.now());
         startFirstLevelTimers();
@@ -1304,8 +1304,7 @@
 
       firstLevelButton.addEventListener("click", () => switchLevel(1));
       secondLevelButton.addEventListener("click", () => switchLevel(2));
-      prehistoryModeButton.addEventListener("click", () => switchPassageMode("prehistory"));
-      shortenModeButton.addEventListener("click", () => switchPassageMode("shorten"));
+      startGameButton.addEventListener("click", startGame);
       prehistoryInput.addEventListener("input", updatePrehistoryCount);
       document.querySelector("#restart-button").addEventListener("click", restart);
       autoWordLimitSelect.addEventListener("change", () => {
@@ -1349,7 +1348,6 @@
       if (passages.length !== 10 || passages.some((passage) => !passage.text.trim())) {
         throw new Error("The excerpt catalog must contain 10 non-empty texts");
       }
-      switchPassageMode(activePassageMode);
       populatePassages();
       renderPassage();
       restart();
