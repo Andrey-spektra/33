@@ -295,8 +295,8 @@
     .hidden-object-heading, .third-story-panel { grid-column: 1 / -1; }
     .hidden-object-heading h2, .third-story-panel h2 { margin: 7px 0 0; font-family: var(--serif); font-size: 25px; font-weight: 500; }
     .hidden-object-heading p, .third-story-note { margin: 9px 0 0; color: var(--muted); font-size: 12px; line-height: 1.6; }
-    .hidden-object-image { position: relative; width: 100%; overflow: hidden; background: #17334a; }
-    .hidden-object-image > img { display: block; width: 100%; height: auto; }
+    .hidden-object-image { position: relative; width: 100%; min-width: 0; overflow: hidden; background: #17334a; }
+    .hidden-object-image > img { display: block; width: 100%; max-width: 100%; height: auto; object-fit: contain; }
     .anomaly-hotspot { position: absolute; z-index: 1; padding: 0; border: 1px solid transparent; border-radius: 50%; background: transparent; cursor: pointer; }
     .anomaly-hotspot:hover, .anomaly-hotspot:focus-visible { border-color: var(--lime); background: rgb(213 237 116 / 16%); outline: 2px solid var(--lime); outline-offset: 1px; }
     .anomaly-hotspot.is-found { border-color: var(--lime); background: rgb(213 237 116 / 43%); }
@@ -320,6 +320,11 @@
     .third-story-footer .finish-button { flex: 0 0 auto; }
     .third-finish-modal .modal-story { max-height: 45vh; overflow: auto; }
     .level-three-layout[hidden] { display: none; }
+
+    @media (max-width: 900px) {
+      .level-three-layout { grid-template-columns: minmax(0, 1fr); }
+      .hidden-object-heading, .third-story-panel { grid-column: 1; }
+    }
 
     .story-panel { display: flex; flex-direction: column; padding: 19px; background: #e9e5da; }
     .story-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
@@ -609,7 +614,7 @@
         <div class="hidden-object-panel">
           <p class="hidden-object-progress" id="anomaly-progress" aria-live="polite">Найдено 0 / 10 несоответствий</p>
           <div class="hidden-object-image" id="hidden-object-image">
-            <img src="IMG_20261012_230318.png" alt="Маленький принц на маленькой планете среди звёзд, дерева, птиц, кота и розы под стеклянным колпаком">
+            <img src="./IMG_20261012_230318.png" width="2304" height="1536" loading="eager" fetchpriority="high" decoding="async" alt="Маленький принц на маленькой планете среди звёзд, дерева, птиц, кота и розы под стеклянным колпаком">
           </div>
         </div>
         <aside class="hidden-object-panel">
