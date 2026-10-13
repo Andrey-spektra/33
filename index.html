@@ -351,7 +351,7 @@
     .hidden-object-image > img { position: absolute; inset: 0; display: block; width: 100%; max-width: 100%; height: 100%; object-fit: contain; }
     .hidden-object-image-error { position: absolute; z-index: 2; inset: auto 8px 8px; margin: 0; padding: 8px; background: var(--white); color: #a33d30; font-size: 12px; text-align: center; }
     .hidden-object-image-error[hidden] { display: none; }
-    .anomaly-hotspot { position: absolute; z-index: 1; padding: 0; border: 1px solid transparent; border-radius: 50%; background: transparent; cursor: pointer; }
+    .anomaly-hotspot { position: absolute; z-index: 1; padding: 0; border: 1px solid transparent; border-radius: 50%; background: transparent; cursor: default; }
     .anomaly-hotspot.is-found { border-color: var(--lime); background: rgb(213 237 116 / 43%); }
     .anomaly-hotspot.is-found::after { position: absolute; top: 50%; left: 50%; color: var(--ink); font-size: 17px; font-weight: 700; content: "✓"; transform: translate(-50%, -50%); }
     .hidden-object-progress, .third-story-count { margin: 0 0 12px; color: var(--muted); font-family: var(--mono); font-size: 11px; }
@@ -429,6 +429,7 @@
     }
     .story-word.is-active { background: var(--lime); color: var(--ink); }
     .story-word.is-dragging { opacity: .32; }
+    .story-paper.is-dragging, .story-paper.is-dragging * { user-select: none; -webkit-user-select: none; }
     .story-word.drop-target { border-bottom-color: var(--coral); background: #f8dfd5; }
     .story-word.drop-before { box-shadow: -2px 0 var(--coral); }
     .story-word.drop-after { box-shadow: 2px 0 var(--coral); }
@@ -520,7 +521,21 @@
     .modal h2 { margin: 14px 0 9px; font-family: var(--serif); font-size: 29px; font-weight: 600; }
     .modal p { margin: 0; color: #596c64; font-size: 13px; line-height: 1.7; }
     .modal-story { margin-top: 17px !important; padding: 12px; background: #fffdf7; font-family: var(--serif); }
-    .modal .finish-button { margin-top: 20px; }
+    .modal .finish-button {
+      min-height: 64px;
+      margin-top: 20px;
+      padding: 6px clamp(18px, 3vw, 30px);
+      border: 0;
+      border-radius: 0;
+      background-color: transparent;
+      background-image: var(--game-button-art);
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: 100% 100%;
+      color: #fff1c7;
+      font-size: 12px;
+      line-height: 1.15;
+    }
     .footer-note { display: flex; justify-content: space-between; gap: 12px; margin-top: 17px; color: #829087; font-family: var(--mono); font-size: 9px; text-transform: uppercase; }
 
     @media (max-width: 760px) {
@@ -877,7 +892,7 @@
           <p class="passage-target">В рассказе должно быть ровно 33</p>
           <div class="passage-progress" id="passage-progress" role="progressbar" aria-label="Сколько лишних слов убрано" aria-valuemin="0" aria-valuemax="67" aria-valuenow="0"><span id="passage-progress-fill"></span></div>
           <p class="passage-status" id="passage-status" aria-live="polite">Убери 67 слов. Оставшиеся можно переставить.</p>
-          <button class="finish-button" id="passage-finish" type="button" disabled>Завершить сокращение</button>
+          <button class="finish-button" id="passage-finish" type="button" disabled hidden>Завершить сокращение</button>
           <button class="quiet-button" id="passage-reset" type="button">Исходный текст</button>
           <p class="passage-credit">10 рассказов · каждый можно сократить до 33 слов.</p>
         </aside>
@@ -1193,6 +1208,7 @@
         passageProgress.setAttribute("aria-valuenow", String(removed));
         passageProgressFill.style.width = `${removable ? (removed / removable) * 100 : 0}%`;
         passageFinish.disabled = remaining !== 33;
+        passageFinish.hidden = remaining !== 33;
         passageStatus.textContent = remaining === 33
           ? "Ровно 33 слова. Можно менять их порядок и завершать."
           : remaining > 33
@@ -1826,6 +1842,7 @@
       storyPaper.addEventListener("pointerdown", (event) => {
         const button = event.target.closest(".story-word");
         if (!button || finished || event.button !== 0) return;
+        storyPaper.setPointerCapture(event.pointerId);
         storyDrag = {
           pointerId: event.pointerId,
           from: Number(button.dataset.index),
@@ -1839,6 +1856,7 @@
         if (!storyDrag || event.pointerId !== storyDrag.pointerId) return;
         if (!storyDrag.started && Math.hypot(event.clientX - storyDrag.startX, event.clientY - storyDrag.startY) > 6) {
           storyDrag.started = true;
+          storyPaper.classList.add("is-dragging");
           storyPaper.querySelector(`[data-index="${storyDrag.from}"]`)?.classList.add("is-dragging");
         }
         if (!storyDrag.started) return;
@@ -1855,6 +1873,7 @@
         if (!storyDrag || event.pointerId !== storyDrag.pointerId) return;
         const drag = storyDrag;
         storyDrag = null;
+        storyPaper.classList.remove("is-dragging");
         if (!drag.started) return;
         const dropTarget = document.elementFromPoint(event.clientX, event.clientY);
         if (dropTarget && storyPaper.contains(dropTarget)) {
@@ -1873,6 +1892,7 @@
 
       document.addEventListener("pointercancel", () => {
         storyDrag = null;
+        storyPaper.classList.remove("is-dragging");
         storyWords.querySelectorAll(".is-dragging, .drop-target, .drop-before, .drop-after").forEach((token) => token.classList.remove("is-dragging", "drop-target", "drop-before", "drop-after"));
       });
 
