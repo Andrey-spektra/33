@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f1efe8">
-  <title>33 слова — игра в истории</title>
+  <title>Безумству кратких поём мы песню</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Literata:opsz,wght@7..72,500;7..72,600;7..72,700&display=swap" rel="stylesheet">
@@ -37,6 +37,72 @@
     }
 
     button { font: inherit; }
+    .launcher {
+      position: fixed;
+      z-index: 10;
+      inset: 0;
+      overflow: auto;
+      background: #071a2b;
+      color: #fffdf7;
+    }
+    .launcher[hidden] { display: none; }
+    .launcher::before {
+      position: fixed;
+      z-index: 0;
+      inset: 0;
+      background-image: linear-gradient(110deg, rgb(4 15 27 / 61%), rgb(4 15 27 / 34%) 55%, rgb(4 15 27 / 68%)), url("./33-slova-cover.webp");
+      background-position: center;
+      background-size: cover;
+      content: "";
+    }
+    .launcher-screen {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      min-height: 100%;
+      align-content: center;
+      justify-items: center;
+      padding: clamp(24px, 5vw, 64px);
+    }
+    .launcher-screen[hidden] { display: none; }
+    .cover-content { width: min(900px, 100%); text-align: center; }
+    .cover-kicker, .menu-kicker { color: #e5d6a9; font-family: var(--mono); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; }
+    .cover-title { margin: 20px 0 28px; color: #fff5d8; font-family: var(--serif); font-size: clamp(42px, 8vw, 88px); font-weight: 600; line-height: 1.08; text-shadow: 0 3px 24px rgb(0 0 0 / 55%); }
+    .launcher-button {
+      min-height: 54px;
+      padding: 0 34px;
+      border: 1px solid #f4dc99;
+      background: #f2dc9e;
+      color: #18342f;
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: 700;
+      box-shadow: 0 8px 28px rgb(0 0 0 / 28%);
+    }
+    .launcher-button:hover, .launcher-button:focus-visible { background: #fff1c7; outline: 3px solid rgb(255 241 199 / 48%); outline-offset: 3px; }
+    .mode-menu { width: min(1240px, 100%); }
+    .mode-menu h2 { margin: 10px 0 26px; color: #fff5d8; font-family: var(--serif); font-size: clamp(30px, 5vw, 48px); font-weight: 500; }
+    .mode-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+    .mode-card {
+      display: flex;
+      min-width: 0;
+      flex-direction: column;
+      padding: 0;
+      overflow: hidden;
+      border: 1px solid rgb(244 220 153 / 72%);
+      background: rgb(8 27 43 / 88%);
+      color: #fffdf7;
+      cursor: pointer;
+      text-align: left;
+      transition: transform 150ms ease, border-color 150ms ease;
+    }
+    .mode-card:hover, .mode-card:focus-visible { border-color: #fff1c7; outline: 3px solid rgb(255 241 199 / 48%); outline-offset: 2px; transform: translateY(-3px); }
+    .mode-card img { display: block; width: 100%; aspect-ratio: 3 / 2; object-fit: cover; }
+    .mode-card-copy { display: grid; gap: 7px; padding: 16px; }
+    .mode-card-copy strong { color: #fff1c7; font-family: var(--serif); font-size: 23px; font-weight: 600; }
+    .mode-card-copy span { color: #e7e5df; font-size: 13px; line-height: 1.55; }
+    .sections-button { padding: 6px 0 6px 10px; border: 0; background: transparent; color: #60736b; cursor: pointer; font-size: 11px; text-decoration: underline; text-underline-offset: 3px; }
+    .sections-button:hover, .sections-button:focus-visible { color: var(--ink); }
     .page { width: min(1180px, calc(100% - 64px)); margin: 0 auto; }
     .topbar {
       min-height: 76px;
@@ -91,6 +157,7 @@
     .subtitle { margin: 0; color: #596c64; font-size: 14px; line-height: 1.6; }
 
     .levels { display: flex; gap: 8px; margin: 28px 0 25px; }
+    .levels[hidden] { display: none; }
     .level {
       display: flex;
       min-height: 44px;
@@ -475,6 +542,14 @@
     .footer-note { display: flex; justify-content: space-between; gap: 12px; margin-top: 17px; color: #829087; font-family: var(--mono); font-size: 9px; text-transform: uppercase; }
 
     @media (max-width: 760px) {
+      .mode-cards { grid-template-columns: 1fr; gap: 12px; }
+      .launcher-screen { align-content: start; }
+      .cover-screen { align-content: center; }
+      .mode-card { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr); }
+      .mode-card img { height: 100%; min-height: 132px; aspect-ratio: auto; object-fit: cover; }
+      .mode-card-copy { align-content: center; padding: 12px; }
+      .mode-card-copy strong { font-size: 19px; }
+      .mode-card-copy span { font-size: 11px; }
       .page { width: min(100% - 36px, 560px); }
       .main { padding-top: 31px; }
       .top-note { max-width: 120px; text-align: right; }
@@ -508,6 +583,8 @@
       .board-action-buttons .finish-button { width: auto; }
       .passage-heading h2 { font-size: 21px; }
       .passage-controls { align-items: flex-start; }
+      .mode-card { grid-template-columns: 1fr; }
+      .mode-card img { height: auto; aspect-ratio: 3 / 2; }
     }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
@@ -515,21 +592,50 @@
   </style>
 </head>
 <body>
+  <div class="launcher" id="launcher">
+    <section class="launcher-screen cover-screen" id="cover-screen" aria-labelledby="cover-title">
+      <div class="cover-content">
+        <span class="cover-kicker">Литературная игра · 33 слова</span>
+        <h1 class="cover-title" id="cover-title">Безумству кратких поём мы песню</h1>
+        <button class="launcher-button" id="cover-start" type="button">Начать</button>
+      </div>
+    </section>
+    <section class="launcher-screen" id="mode-menu-screen" aria-labelledby="mode-menu-title" hidden>
+      <div class="mode-menu">
+        <span class="menu-kicker">Выбери раздел</span>
+        <h2 id="mode-menu-title">Куда отправимся?</h2>
+        <div class="mode-cards">
+          <button class="mode-card" type="button" data-level="1" aria-label="Словопад. Думай быстро, хватай слова ловко.">
+            <img src="./33-slova-mode-slovopad.png" alt="">
+            <span class="mode-card-copy"><strong>Словопад</strong><span>Думай быстро, хватай слова ловко.</span></span>
+          </button>
+          <button class="mode-card" type="button" data-level="2" aria-label="Редактор. Подумай над классикой. Сократи классический отрывок до 33 слов и придумай к нему предысторию.">
+            <img src="./33-slova-mode-redaktor.png" alt="">
+            <span class="mode-card-copy"><strong>Редактор</strong><span>Подумай над классикой. Сократи классический отрывок до 33 слов и придумай к нему предысторию.</span></span>
+          </button>
+          <button class="mode-card" type="button" data-level="3" aria-label="Несоответствия. На иллюстрации к известному произведению найди 10 несоответствий и получи слова для своего рассказа.">
+            <img src="./33-slova-mode-nesootvetstviya.png" alt="">
+            <span class="mode-card-copy"><strong>Несоответствия</strong><span>На иллюстрации к известному произведению найди 10 несоответствий — и получишь слова для своего рассказа.</span></span>
+          </button>
+        </div>
+      </div>
+    </section>
+  </div>
   <div class="page">
     <header class="topbar">
       <div class="wordmark" aria-label="33 слова">
         <span class="mark" aria-hidden="true">33</span>
-        <span class="brand">Тридцать три слова<small>игра в истории</small></span>
+        <span class="brand">Безумству кратких<small>поём мы песню</small></span>
       </div>
-      <span class="top-note">Слова падают. Истории остаются.</span>
+      <button class="sections-button" id="sections-button" type="button">К выбору раздела</button>
     </header>
 
     <main class="main">
-      <div class="eyebrow" id="page-eyebrow">Три уровня · уровень первый</div>
-      <h1>33 слова</h1>
+      <div class="eyebrow" id="page-eyebrow">Словопад</div>
+      <h1 id="game-title">Словопад</h1>
       <p class="subtitle" id="page-subtitle">Лови слова и фразы, затем дополни рассказ своими словами до 33.</p>
 
-      <nav class="levels" aria-label="Уровни игры">
+      <nav class="levels" aria-label="Разделы игры" hidden>
         <button class="level active" id="level-one-button" type="button" aria-current="step"><span class="level-number">01</span><span>Рассказ</span></button>
         <button class="level" id="level-two-button" type="button"><span class="level-number">02</span><span>История</span></button>
         <button class="level" id="level-three-button" type="button"><span class="level-number">03</span><span>Несоответствия</span></button>
@@ -744,6 +850,11 @@
       const firstLevelButton = document.querySelector("#level-one-button");
       const secondLevelButton = document.querySelector("#level-two-button");
       const thirdLevelButton = document.querySelector("#level-three-button");
+      const launcher = document.querySelector("#launcher");
+      const coverScreen = document.querySelector("#cover-screen");
+      const modeMenuScreen = document.querySelector("#mode-menu-screen");
+      const gamePage = document.querySelector(".page");
+      const sectionsButton = document.querySelector("#sections-button");
       const anomalyImage = document.querySelector("#hidden-object-image");
       const anomalyPhoto = document.querySelector("#anomaly-photo");
       const anomalyImageError = document.querySelector("#anomaly-image-error");
@@ -764,6 +875,7 @@
       const thirdFinishClose = document.querySelector("#third-finish-close");
       const pageEyebrow = document.querySelector("#page-eyebrow");
       const pageSubtitle = document.querySelector("#page-subtitle");
+      const gameTitle = document.querySelector("#game-title");
       const passageEditor = document.querySelector("#passage-editor");
       const passageCount = document.querySelector("#passage-count");
       const passageTotal = document.querySelector("#passage-total");
@@ -1120,7 +1232,7 @@
         if (activeLevel === 1 && !isFirstLevel) {
           clearInterval(spawnTimer);
           clearInterval(frameTimer);
-          firstLevelPausedAt = firstLevelStarted ? performance.now() : null;
+          if (firstLevelStarted && firstLevelPausedAt === null) firstLevelPausedAt = performance.now();
         }
         if (isFirstLevel) {
           if (firstLevelStarted && firstLevelPausedAt !== null) {
@@ -1130,7 +1242,8 @@
           firstLevelView.hidden = false;
           secondLevelView.hidden = true;
           thirdLevelView.hidden = true;
-          pageEyebrow.textContent = "Три уровня · уровень первый";
+          pageEyebrow.textContent = "Раздел · Словопад";
+          gameTitle.textContent = "Словопад";
           pageSubtitle.textContent = "Лови слова и фразы, затем дополни рассказ своими словами до 33.";
           if (firstLevelStarted) {
             renderBoard(performance.now());
@@ -1141,16 +1254,19 @@
           firstLevelView.hidden = true;
           secondLevelView.hidden = false;
           thirdLevelView.hidden = true;
-          pageEyebrow.textContent = "Три уровня · уровень второй";
+          pageEyebrow.textContent = "Раздел · Редактор";
+          gameTitle.textContent = "Редактор";
           pageSubtitle.textContent = "Допиши предысторию и сократи рассказ до 33 слов.";
           renderPassage();
         } else {
           firstLevelView.hidden = true;
           secondLevelView.hidden = true;
           thirdLevelView.hidden = false;
-          pageEyebrow.textContent = "Три уровня · уровень третий";
+          pageEyebrow.textContent = "Раздел · Несоответствия";
+          gameTitle.textContent = "Несоответствия";
           pageSubtitle.textContent = "Найди несоответствия на картине и собери рассказ из найденных слов.";
         }
+
         activeLevel = level;
         firstLevelButton.classList.toggle("active", isFirstLevel);
         secondLevelButton.classList.toggle("active", isSecondLevel);
@@ -1168,6 +1284,37 @@
           firstLevelButton.removeAttribute("aria-current");
           secondLevelButton.removeAttribute("aria-current");
         }
+      }
+
+      function showModeMenu() {
+        if (activeLevel === 1) {
+          clearInterval(spawnTimer);
+          clearInterval(frameTimer);
+          if (firstLevelStarted && firstLevelPausedAt === null) firstLevelPausedAt = performance.now();
+        }
+        coverScreen.hidden = true;
+        modeMenuScreen.hidden = false;
+        launcher.hidden = false;
+        gamePage.inert = true;
+        sectionsButton.hidden = true;
+        modeMenuScreen.querySelector(".mode-card")?.focus();
+      }
+
+      function enterMode(level) {
+        if (level === activeLevel) {
+          if (level === 1 && firstLevelStarted && firstLevelPausedAt !== null) {
+            const pausedFor = performance.now() - firstLevelPausedAt;
+            falling.forEach((word) => { word.born += pausedFor; });
+            firstLevelPausedAt = null;
+            renderBoard(performance.now());
+            startFirstLevelTimers();
+          }
+        } else {
+          switchLevel(level);
+        }
+        launcher.hidden = true;
+        gamePage.inert = false;
+        sectionsButton.hidden = false;
       }
 
       function renderStory(focusIndex = null) {
@@ -1747,6 +1894,11 @@
       firstLevelButton.addEventListener("click", () => switchLevel(1));
       secondLevelButton.addEventListener("click", () => switchLevel(2));
       thirdLevelButton.addEventListener("click", () => switchLevel(3));
+      document.querySelector("#cover-start").addEventListener("click", showModeMenu);
+      document.querySelectorAll(".mode-card").forEach((button) => {
+        button.addEventListener("click", () => enterMode(Number(button.dataset.level)));
+      });
+      sectionsButton.addEventListener("click", showModeMenu);
       startGameButton.addEventListener("click", startGame);
       prehistoryInput.addEventListener("input", updatePrehistoryCount);
       document.querySelector("#restart-button").addEventListener("click", restart);
@@ -1804,6 +1956,8 @@
       if (anomalies.length !== 10 || anomalies.some((anomaly) => anomaly.words.length !== 3)) {
         throw new Error("The hidden-object game must contain 10 anomalies with 3 words each");
       }
+      gamePage.inert = true;
+      sectionsButton.hidden = true;
       renderAnomalyBoard();
       renderAnomalyWords();
       populatePassages();
