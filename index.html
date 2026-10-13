@@ -295,8 +295,10 @@
     .hidden-object-heading, .third-story-panel { grid-column: 1 / -1; }
     .hidden-object-heading h2, .third-story-panel h2 { margin: 7px 0 0; font-family: var(--serif); font-size: 25px; font-weight: 500; }
     .hidden-object-heading p, .third-story-note { margin: 9px 0 0; color: var(--muted); font-size: 12px; line-height: 1.6; }
-    .hidden-object-image { position: relative; width: 100%; min-width: 0; overflow: hidden; background: #17334a; }
-    .hidden-object-image > img { display: block; width: 100%; max-width: 100%; height: auto; object-fit: contain; }
+    .hidden-object-image { position: relative; width: 100%; min-width: 0; aspect-ratio: 3 / 2; overflow: hidden; background: #17334a; }
+    .hidden-object-image > img { position: absolute; inset: 0; display: block; width: 100%; max-width: 100%; height: 100%; object-fit: contain; }
+    .hidden-object-image-error { position: absolute; z-index: 2; inset: auto 8px 8px; margin: 0; padding: 8px; background: var(--white); color: #a33d30; font-size: 12px; text-align: center; }
+    .hidden-object-image-error[hidden] { display: none; }
     .anomaly-hotspot { position: absolute; z-index: 1; padding: 0; border: 1px solid transparent; border-radius: 50%; background: transparent; cursor: pointer; }
     .anomaly-hotspot:hover, .anomaly-hotspot:focus-visible { border-color: var(--lime); background: rgb(213 237 116 / 16%); outline: 2px solid var(--lime); outline-offset: 1px; }
     .anomaly-hotspot.is-found { border-color: var(--lime); background: rgb(213 237 116 / 43%); }
@@ -310,10 +312,11 @@
     .anomaly-word-option[aria-pressed="true"] { border-color: var(--green); background: var(--green); color: white; }
     .anomaly-word-option:disabled { cursor: not-allowed; opacity: .58; }
     .third-story-panel[hidden] { display: none; }
-    .third-story-paper { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 14px; padding: 15px; border-left: 2px solid var(--coral); background-color: #f8f5ec; background-image: repeating-linear-gradient(to bottom, transparent 0, transparent 35px, #e8e4da 35px, #e8e4da 36px); }
-    .third-story-token { position: relative; display: inline-flex; min-width: 65px; min-height: 34px; align-items: center; padding: 3px 7px; border: 1px solid #d7c9b9; background: rgb(255 253 247 / 82%); color: var(--ink); font-family: var(--serif); font-size: 14px; }
-    .third-story-token.is-custom { cursor: text; }
-    .third-story-token input { width: 100%; min-width: 3ch; padding: 0; border: 0; outline: none; background: transparent; color: inherit; font: inherit; }
+    .third-story-paper { display: flex; min-height: 170px; flex-wrap: wrap; align-content: flex-start; gap: 7px; margin-top: 14px; padding: 15px; border-left: 2px solid var(--coral); background-color: #f8f5ec; background-image: repeating-linear-gradient(to bottom, transparent 0, transparent 35px, #e8e4da 35px, #e8e4da 36px); }
+    .third-story-token { position: relative; display: inline-flex; min-width: 65px; min-height: 34px; align-items: center; padding: 3px 7px; border: 1px solid #d7c9b9; background: rgb(255 253 247 / 82%); color: var(--ink); font-family: var(--serif); font-size: 14px; touch-action: none; }
+    .third-story-token:not(.is-custom) { cursor: grab; }
+    .third-story-token.is-custom { flex: 1 1 90px; min-width: 76px; cursor: text; }
+    .third-story-token input { width: 100%; min-width: 5ch; padding: 0; border: 0; outline: none; background: transparent; color: inherit; font: inherit; }
     .third-story-token.is-dragging { opacity: .35; }
     .third-story-token.drop-target { outline: 2px solid var(--coral); }
     .third-story-footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 14px; }
@@ -614,7 +617,8 @@
         <div class="hidden-object-panel">
           <p class="hidden-object-progress" id="anomaly-progress" aria-live="polite">Найдено 0 / 10 несоответствий</p>
           <div class="hidden-object-image" id="hidden-object-image">
-            <img src="./IMG_20261012_230318.png" width="2304" height="1536" loading="eager" fetchpriority="high" decoding="async" alt="Маленький принц на маленькой планете среди звёзд, дерева, птиц, кота и розы под стеклянным колпаком">
+            <img id="anomaly-photo" src="./IMG_20261012_230318.png" width="2304" height="1536" loading="eager" fetchpriority="high" decoding="async" alt="Маленький принц на маленькой планете среди звёзд, дерева, птиц, кота и розы под стеклянным колпаком">
+            <p class="hidden-object-image-error" id="anomaly-image-error" role="alert" hidden>Не удалось загрузить картину. Проверьте подключение и обновите страницу.</p>
           </div>
         </div>
         <aside class="hidden-object-panel">
@@ -626,9 +630,9 @@
         <section class="third-story-panel" id="third-story-panel" aria-labelledby="third-story-title" hidden>
           <span class="label">Твой рассказ</span>
           <h2 id="third-story-title">Собери историю из 33 слов</h2>
-          <p class="third-story-note">Переставляй слова перетаскиванием или стрелками. Добавь по одному своему слову в пустые поля.</p>
+          <p class="third-story-note">Перетаскивай слова или переставляй их стрелками. К 10 выбранным словам добавь 23 своих — по одному в каждое поле.</p>
           <p class="third-story-count" id="third-story-count" aria-live="polite">10 / 33 слов</p>
-          <div class="third-story-paper" id="third-story-paper" aria-label="Рассказ из выбранных и своих слов"></div>
+          <div class="third-story-paper story-paper" id="third-story-paper" aria-label="Рассказ из выбранных и своих слов"></div>
           <div class="third-story-footer">
             <button class="quiet-button" id="third-change-words" type="button">Изменить выбор слов</button>
             <button class="finish-button" id="third-finish-button" type="button" disabled>Завершить рассказ</button>
@@ -724,6 +728,8 @@
       const secondLevelButton = document.querySelector("#level-two-button");
       const thirdLevelButton = document.querySelector("#level-three-button");
       const anomalyImage = document.querySelector("#hidden-object-image");
+      const anomalyPhoto = document.querySelector("#anomaly-photo");
+      const anomalyImageError = document.querySelector("#anomaly-image-error");
       const anomalyProgress = document.querySelector("#anomaly-progress");
       const anomalyWordProgress = document.querySelector("#anomaly-word-progress");
       const anomalyWordGroups = document.querySelector("#anomaly-word-groups");
@@ -986,8 +992,10 @@
 
       function renderThirdStory(focusIndex = null) {
         thirdStoryPaper.replaceChildren();
+        let customWordNumber = 0;
         thirdStoryEntries.forEach((entry, index) => {
           if (entry.custom) {
+            customWordNumber += 1;
             const label = document.createElement("label");
             label.className = "third-story-token is-custom";
             label.dataset.index = String(index);
@@ -996,9 +1004,9 @@
             input.autocomplete = "off";
             input.spellcheck = true;
             input.value = entry.text;
-            input.placeholder = "своё";
+            input.placeholder = `своё ${customWordNumber}`;
             input.size = Math.max(4, entry.text.length);
-            input.setAttribute("aria-label", `Своё слово, позиция ${index + 1} из 33`);
+            input.setAttribute("aria-label", `Своё слово ${customWordNumber} из 23, позиция ${index + 1} из 33`);
             input.setAttribute("aria-invalid", String(entry.text.trim() !== "" && countWords(entry.text) !== 1));
             label.append(input);
             thirdStoryPaper.append(label);
@@ -1529,6 +1537,16 @@
         renderAnomalyBoard(foundAnomalyId);
         renderAnomalyWords();
       });
+
+      anomalyPhoto.addEventListener("error", () => {
+        anomalyImageError.hidden = false;
+      });
+      anomalyPhoto.addEventListener("load", () => {
+        anomalyImageError.hidden = true;
+      });
+      if (anomalyPhoto.complete && anomalyPhoto.naturalWidth === 0) {
+        anomalyImageError.hidden = false;
+      }
 
       anomalyWordGroups.addEventListener("click", (event) => {
         const button = event.target.closest(".anomaly-word-option");
