@@ -290,6 +290,36 @@
     .passage-sidebar .quiet-button:hover { color: white; }
     .passage-credit { margin: 14px 0 0; color: #afc2b7; font-family: var(--mono); font-size: 9px; line-height: 1.6; }
     .level-two-layout[hidden], .game-layout[hidden] { display: none; }
+    .level-three-layout { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(270px, .75fr); gap: 18px; align-items: start; }
+    .hidden-object-heading, .hidden-object-panel, .third-story-panel { min-width: 0; padding: 21px; border: 1px solid var(--line); background: var(--white); }
+    .hidden-object-heading, .third-story-panel { grid-column: 1 / -1; }
+    .hidden-object-heading h2, .third-story-panel h2 { margin: 7px 0 0; font-family: var(--serif); font-size: 25px; font-weight: 500; }
+    .hidden-object-heading p, .third-story-note { margin: 9px 0 0; color: var(--muted); font-size: 12px; line-height: 1.6; }
+    .hidden-object-image { position: relative; width: 100%; overflow: hidden; background: #17334a; }
+    .hidden-object-image > img { display: block; width: 100%; height: auto; }
+    .anomaly-hotspot { position: absolute; z-index: 1; padding: 0; border: 1px solid transparent; border-radius: 50%; background: transparent; cursor: pointer; }
+    .anomaly-hotspot:hover, .anomaly-hotspot:focus-visible { border-color: var(--lime); background: rgb(213 237 116 / 16%); outline: 2px solid var(--lime); outline-offset: 1px; }
+    .anomaly-hotspot.is-found { border-color: var(--lime); background: rgb(213 237 116 / 43%); }
+    .anomaly-hotspot.is-found::after { position: absolute; top: 50%; left: 50%; color: var(--ink); font-size: 17px; font-weight: 700; content: "✓"; transform: translate(-50%, -50%); }
+    .hidden-object-progress, .third-story-count { margin: 0 0 12px; color: var(--muted); font-family: var(--mono); font-size: 11px; }
+    .anomaly-word-group { padding: 12px 0; border-top: 1px solid var(--line); }
+    .anomaly-word-group h3 { margin: 0 0 8px; color: var(--ink); font-family: var(--serif); font-size: 16px; font-weight: 500; }
+    .anomaly-word-options { display: flex; flex-wrap: wrap; gap: 7px; }
+    .anomaly-word-option { min-height: 34px; padding: 0 10px; border: 1px solid var(--line); background: var(--paper); color: var(--ink); cursor: pointer; font-size: 12px; }
+    .anomaly-word-option:hover:not(:disabled), .anomaly-word-option:focus-visible { border-color: var(--green); outline: 2px solid var(--lime); }
+    .anomaly-word-option[aria-pressed="true"] { border-color: var(--green); background: var(--green); color: white; }
+    .anomaly-word-option:disabled { cursor: not-allowed; opacity: .58; }
+    .third-story-panel[hidden] { display: none; }
+    .third-story-paper { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 14px; padding: 15px; border-left: 2px solid var(--coral); background-color: #f8f5ec; background-image: repeating-linear-gradient(to bottom, transparent 0, transparent 35px, #e8e4da 35px, #e8e4da 36px); }
+    .third-story-token { position: relative; display: inline-flex; min-width: 65px; min-height: 34px; align-items: center; padding: 3px 7px; border: 1px solid #d7c9b9; background: rgb(255 253 247 / 82%); color: var(--ink); font-family: var(--serif); font-size: 14px; }
+    .third-story-token.is-custom { cursor: text; }
+    .third-story-token input { width: 100%; min-width: 3ch; padding: 0; border: 0; outline: none; background: transparent; color: inherit; font: inherit; }
+    .third-story-token.is-dragging { opacity: .35; }
+    .third-story-token.drop-target { outline: 2px solid var(--coral); }
+    .third-story-footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 14px; }
+    .third-story-footer .finish-button { flex: 0 0 auto; }
+    .third-finish-modal .modal-story { max-height: 45vh; overflow: auto; }
+    .level-three-layout[hidden] { display: none; }
 
     .story-panel { display: flex; flex-direction: column; padding: 19px; background: #e9e5da; }
     .story-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
@@ -441,6 +471,9 @@
       .story-panel { min-height: 380px; padding: 16px; }
       .story-paper { min-height: 205px; }
       .level-two-layout { grid-template-columns: 1fr; }
+      .level-three-layout { grid-template-columns: 1fr; gap: 12px; }
+      .hidden-object-heading, .third-story-panel { grid-column: auto; }
+      .hidden-object-heading, .hidden-object-panel, .third-story-panel { padding: 16px; }
       .passage-panel { padding: 16px; }
       .passage-select { width: min(230px, 54vw); }
       .passage-paper { padding: 16px 14px; font-size: 15px; }
@@ -482,7 +515,7 @@
       <nav class="levels" aria-label="Уровни игры">
         <button class="level active" id="level-one-button" type="button" aria-current="step"><span class="level-number">01</span><span>Рассказ</span></button>
         <button class="level" id="level-two-button" type="button"><span class="level-number">02</span><span>История</span></button>
-        <div class="level soon" aria-label="Уровень 3, скоро"><span class="level-number">03</span><span>Уровень 3</span><span class="level-tag">скоро</span></div>
+        <button class="level" id="level-three-button" type="button"><span class="level-number">03</span><span>Несоответствия</span></button>
       </nav>
 
       <section class="game-layout" id="level-one" aria-label="Первый уровень: составление рассказа">
@@ -567,6 +600,36 @@
           <p class="passage-credit">10 рассказов · каждый можно сократить до 33 слов.</p>
         </aside>
       </section>
+      <section class="level-three-layout" id="level-three" aria-label="Третий уровень: найди несоответствия на картине" hidden>
+        <header class="hidden-object-heading">
+          <span class="label">Третий уровень · Маленький принц</span>
+          <h2>Найдите несоответствия и соберите рассказ</h2>
+          <p>Мы нашли на этой картине 10 несоответствий произведению Экзюпери «Маленький принц». Найдите их и вы — и получите слова для своего рассказа. Найдите все 10, выберите 10 слов из 30 и дополните ими свою историю до 33 слов.</p>
+        </header>
+        <div class="hidden-object-panel">
+          <p class="hidden-object-progress" id="anomaly-progress" aria-live="polite">Найдено 0 / 10 несоответствий</p>
+          <div class="hidden-object-image" id="hidden-object-image">
+            <img src="IMG_20261012_230318.png" alt="Маленький принц на маленькой планете среди звёзд, дерева, птиц, кота и розы под стеклянным колпаком">
+          </div>
+        </div>
+        <aside class="hidden-object-panel">
+          <p class="hidden-object-progress" id="anomaly-word-progress" aria-live="polite">Открыто 0 / 30 слов · выбрано 0 / 10</p>
+          <div id="anomaly-word-groups">
+            <p class="third-story-note">Нажимай на картину, чтобы находить несоответствия. Когда найдёшь все десять, выбери любые десять слов.</p>
+          </div>
+        </aside>
+        <section class="third-story-panel" id="third-story-panel" aria-labelledby="third-story-title" hidden>
+          <span class="label">Твой рассказ</span>
+          <h2 id="third-story-title">Собери историю из 33 слов</h2>
+          <p class="third-story-note">Переставляй слова перетаскиванием или стрелками. Добавь по одному своему слову в пустые поля.</p>
+          <p class="third-story-count" id="third-story-count" aria-live="polite">10 / 33 слов</p>
+          <div class="third-story-paper" id="third-story-paper" aria-label="Рассказ из выбранных и своих слов"></div>
+          <div class="third-story-footer">
+            <button class="quiet-button" id="third-change-words" type="button">Изменить выбор слов</button>
+            <button class="finish-button" id="third-finish-button" type="button" disabled>Завершить рассказ</button>
+          </div>
+        </section>
+      </section>
       <div class="footer-note"><span>Одна история · 33 слова</span><span>Слова исчезают — твой шанс нет</span></div>
     </main>
   </div>
@@ -588,6 +651,16 @@
       <p>Ровно 33 слова. Ты сохранил смысл классического отрывка и выбрал его новый ритм.</p>
       <p class="modal-story" id="passage-result"></p>
       <button class="finish-button" id="passage-play-again" type="button">Попробовать ещё раз</button>
+    </section>
+  </div>
+
+  <div class="modal-backdrop third-finish-modal" id="third-finish-modal" hidden>
+    <section class="modal" role="dialog" aria-modal="true" aria-labelledby="third-finish-title">
+      <span class="modal-kicker">уровень третий · завершён</span>
+      <h2 id="third-finish-title">История сложилась.</h2>
+      <p>Ты нашёл все несоответствия и собрал рассказ из 33 слов.</p>
+      <p class="modal-story" id="third-final-story"></p>
+      <button class="finish-button" id="third-finish-close" type="button">Вернуться к картине</button>
     </section>
   </div>
 
@@ -641,8 +714,21 @@
       const modalClose = document.querySelector("#modal-close");
       const firstLevelView = document.querySelector("#level-one");
       const secondLevelView = document.querySelector("#level-two");
+      const thirdLevelView = document.querySelector("#level-three");
       const firstLevelButton = document.querySelector("#level-one-button");
       const secondLevelButton = document.querySelector("#level-two-button");
+      const thirdLevelButton = document.querySelector("#level-three-button");
+      const anomalyImage = document.querySelector("#hidden-object-image");
+      const anomalyProgress = document.querySelector("#anomaly-progress");
+      const anomalyWordProgress = document.querySelector("#anomaly-word-progress");
+      const anomalyWordGroups = document.querySelector("#anomaly-word-groups");
+      const thirdStoryPanel = document.querySelector("#third-story-panel");
+      const thirdStoryPaper = document.querySelector("#third-story-paper");
+      const thirdStoryCount = document.querySelector("#third-story-count");
+      const thirdFinishButton = document.querySelector("#third-finish-button");
+      const thirdFinishModal = document.querySelector("#third-finish-modal");
+      const thirdFinalStory = document.querySelector("#third-final-story");
+      const thirdFinishClose = document.querySelector("#third-finish-close");
       const pageEyebrow = document.querySelector("#page-eyebrow");
       const pageSubtitle = document.querySelector("#page-subtitle");
       const passageEditor = document.querySelector("#passage-editor");
@@ -668,6 +754,18 @@
         { id: "garnet-bracelet", title: "Гранатовый браслет", author: "А.И. Куприн", year: "1911", page: "Гранатовый браслет (Куприн)", text: `Я знаю, что я не могу быть с вами. Но я люблю вас. Я люблю вас так, как никто. Я не прошу ничего. Я просто хочу, чтобы вы знали. Я счастлив уже тем, что вы есть. Я пишу вам это письмо. Я не надеюсь на ответ. Я хочу, чтобы вы помнили обо мне. Я умру с мыслью о вас. Прощайте. Это было последнее письмо. Он умер. Она получила письмо. Она заплакала. Она поняла, что потеряла настоящую любовь. Она прочитала письмо ещё раз. Она посмотрела на браслет. Она вспомнила его лицо. Она поняла, что он был единственным, кто любил её по-настоящему. Она жалела, что не ответила ему. Но было поздно. Она осталась одна.` },
         { id: "dark-alleys", title: "Тёмные аллеи", author: "И.А. Бунин", year: "1943", page: "Тёмные аллеи (Бунин)", text: `Он вспомнил свою молодость. Он вспомнил Надежду. Он понял, что потерял счастье. Он думал о том, что могло быть. Он жалел о прошлом. Он ехал в тарантасе. Он смотрел на поля. Он думал о своей жизни. Он понял, что она прошла мимо. Он хотел вернуть время назад. Но было поздно. Он заплакал. Он понял, что Надежда была его единственной любовью. Он потерял её навсегда. Он приехал на станцию. Он увидел её. Она была всё той же. Он понял, что всё ещё любит её. Но она не подошла к нему. Она только посмотрела. И он понял, что между ними всё кончено. Он уехал. И больше никогда не вернулся.` }
       ];
+      const anomalies = [
+        { id: "dinosaur", label: "Тиранозавр среди птиц", words: ["Тиран", "голод", "гигант"], x: 0, y: 41, width: 15, height: 14 },
+        { id: "bast-shoes", label: "Лапти на ногах принца", words: ["простота", "лапоть", "бедность"], x: 37, y: 46, width: 8, height: 8 },
+        { id: "ring", label: "Кольцо на груди принца", words: ["власть", "миссия", "предназначение"], x: 41, y: 25, width: 5, height: 7 },
+        { id: "apple", label: "Красное яблоко на небе", words: ["раздор", "красота", "сок"], x: 59, y: 10, width: 5, height: 7 },
+        { id: "death-star", label: "Звезда смерти на небе", words: ["смерть", "разрушение", "страх"], x: 83, y: 4, width: 10, height: 14 },
+        { id: "birch", label: "Берёза", words: ["Род", "праздник", "чистота"], x: 56, y: 27, width: 8, height: 24 },
+        { id: "cat", label: "Кот", words: ["опыт", "умиление", "попрошайка"], x: 66, y: 25, width: 13, height: 20 },
+        { id: "lake", label: "Озеро с камышами", words: ["поверхность", "круг", "шелест"], x: 60, y: 63, width: 15, height: 14 },
+        { id: "carving", label: "Лик, вырезанный на баобабе у озера", words: ["лик", "предки", "божество"], x: 76, y: 55, width: 8, height: 15 },
+        { id: "rose", label: "Красная ромашка вместо розы", words: ["гадание", "любовь", "предательство"], x: 45, y: 37, width: 9, height: 13 }
+      ];
       const passageSelect = document.querySelector("#passage-select");
       const passageTitle = document.querySelector("#passage-title");
       const passageSource = document.querySelector("#passage-source");
@@ -692,6 +790,10 @@
       let ignoreStoryClick = false;
       let pointerDrag = null;
       let ignoreTokenClick = false;
+      const foundAnomalies = new Set();
+      const chosenAnomalyWords = new Set();
+      let thirdStoryEntries = [];
+      let thirdStoryDrag = null;
 
       function countWords(text) {
         return text.trim() ? text.trim().split(/\s+/u).length : 0;
@@ -802,6 +904,151 @@
         prehistoryCount.textContent = `${enteredWords.length} / 33 слов`;
       }
 
+      function renderAnomalyBoard(focusAnomalyId = null) {
+        anomalyImage.querySelectorAll(".anomaly-hotspot").forEach((button) => button.remove());
+        anomalies.forEach((anomaly, index) => {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = `anomaly-hotspot${foundAnomalies.has(anomaly.id) ? " is-found" : ""}`;
+          button.dataset.anomaly = anomaly.id;
+          button.style.left = `${anomaly.x}%`;
+          button.style.top = `${anomaly.y}%`;
+          button.style.width = `${anomaly.width}%`;
+          button.style.height = `${anomaly.height}%`;
+          button.setAttribute("aria-label", `${foundAnomalies.has(anomaly.id) ? "Найдено" : `Найти несоответствие ${index + 1}`}: ${anomaly.label}`);
+          button.setAttribute("aria-pressed", String(foundAnomalies.has(anomaly.id)));
+          anomalyImage.append(button);
+        });
+        if (focusAnomalyId !== null) {
+          anomalyImage.querySelector(`[data-anomaly="${focusAnomalyId}"]`)?.focus();
+        }
+      }
+
+      function renderAnomalyWords(focusWordKey = null) {
+        anomalyWordGroups.replaceChildren();
+        const canChoose = foundAnomalies.size === anomalies.length;
+        anomalies.filter((anomaly) => foundAnomalies.has(anomaly.id)).forEach((anomaly) => {
+          const group = document.createElement("section");
+          group.className = "anomaly-word-group";
+          const heading = document.createElement("h3");
+          heading.textContent = anomaly.label;
+          const options = document.createElement("div");
+          options.className = "anomaly-word-options";
+          anomaly.words.forEach((word) => {
+            const key = `${anomaly.id}:${word}`;
+            const button = document.createElement("button");
+            button.type = "button";
+            button.className = "anomaly-word-option";
+            button.dataset.wordKey = key;
+            button.textContent = word;
+            button.disabled = !canChoose
+              || !thirdStoryPanel.hidden
+              || (!chosenAnomalyWords.has(key) && chosenAnomalyWords.size >= 10);
+            button.setAttribute("aria-pressed", String(chosenAnomalyWords.has(key)));
+            options.append(button);
+          });
+          group.append(heading, options);
+          anomalyWordGroups.append(group);
+        });
+        if (!canChoose) {
+          const note = document.createElement("p");
+          note.className = "third-story-note";
+          note.textContent = "Найди все 10 несоответствий — тогда откроются все 30 слов.";
+          anomalyWordGroups.append(note);
+        } else if (chosenAnomalyWords.size < 10) {
+          const note = document.createElement("p");
+          note.className = "third-story-note";
+          note.textContent = "Выбери любые 10 слов из 30.";
+          anomalyWordGroups.append(note);
+        }
+        anomalyWordProgress.textContent = `Открыто ${foundAnomalies.size * 3} / 30 слов · выбрано ${chosenAnomalyWords.size} / 10`;
+        if (focusWordKey !== null) {
+          anomalyWordGroups.querySelector(`[data-word-key="${focusWordKey}"]`)?.focus();
+        }
+      }
+
+      function buildThirdStory() {
+        const selectedWords = anomalies.flatMap((anomaly) => anomaly.words
+          .filter((word) => chosenAnomalyWords.has(`${anomaly.id}:${word}`)));
+        thirdStoryEntries = [
+          ...selectedWords.map((text) => ({ text, custom: false })),
+          ...Array.from({ length: targetWordCount - selectedWords.length }, () => ({ text: "", custom: true }))
+        ];
+        thirdStoryPanel.hidden = false;
+        renderThirdStory();
+        thirdStoryPaper.querySelector(".third-story-token input")?.focus();
+      }
+
+      function renderThirdStory(focusIndex = null) {
+        thirdStoryPaper.replaceChildren();
+        thirdStoryEntries.forEach((entry, index) => {
+          if (entry.custom) {
+            const label = document.createElement("label");
+            label.className = "third-story-token is-custom";
+            label.dataset.index = String(index);
+            const input = document.createElement("input");
+            input.type = "text";
+            input.autocomplete = "off";
+            input.spellcheck = true;
+            input.value = entry.text;
+            input.placeholder = "своё";
+            input.size = Math.max(4, entry.text.length);
+            input.setAttribute("aria-label", `Своё слово, позиция ${index + 1} из 33`);
+            input.setAttribute("aria-invalid", String(entry.text.trim() !== "" && countWords(entry.text) !== 1));
+            label.append(input);
+            thirdStoryPaper.append(label);
+          } else {
+            const button = document.createElement("button");
+            button.type = "button";
+            button.className = "third-story-token";
+            button.textContent = entry.text;
+            button.dataset.index = String(index);
+            button.setAttribute("aria-label", `Слово «${entry.text}», позиция ${index + 1} из 33. Используй стрелки, чтобы переставить`);
+            thirdStoryPaper.append(button);
+          }
+        });
+        if (focusIndex !== null) thirdStoryPaper.querySelector(`[data-index="${focusIndex}"] input, [data-index="${focusIndex}"]`)?.focus();
+        updateThirdStoryCount();
+      }
+
+      function updateThirdStoryCount() {
+        const count = thirdStoryEntries.reduce((total, entry) => total + countWords(entry.text), 0);
+        const invalidEntry = thirdStoryEntries.some((entry) => entry.custom && entry.text.trim() !== "" && countWords(entry.text) !== 1);
+        thirdStoryCount.textContent = invalidEntry
+          ? `${count} / 33 слов · в каждом поле должно быть одно слово`
+          : `${count} / 33 слов`;
+        thirdFinishButton.disabled = count !== targetWordCount
+          || thirdStoryEntries.some((entry) => entry.custom && countWords(entry.text) !== 1);
+      }
+
+      function thirdStoryPlacement(clientX, clientY) {
+        const tokens = [...thirdStoryPaper.querySelectorAll(".third-story-token")];
+        if (tokens.length === 0) return { index: 0, targetIndex: null };
+        let closest = null;
+        let closestDistance = Infinity;
+        tokens.forEach((token, index) => {
+          const rect = token.getBoundingClientRect();
+          const dx = clientX < rect.left ? rect.left - clientX : clientX > rect.right ? clientX - rect.right : 0;
+          const dy = clientY < rect.top ? rect.top - clientY : clientY > rect.bottom ? clientY - rect.bottom : 0;
+          const distance = dx * dx + dy * dy;
+          if (distance < closestDistance) {
+            const after = clientY >= rect.top && clientY <= rect.bottom
+              ? clientX > (rect.left + rect.right) / 2
+              : clientY > (rect.top + rect.bottom) / 2;
+            closestDistance = distance;
+            closest = { index, after };
+          }
+        });
+        return { index: closest.index + Number(closest.after), targetIndex: closest.index };
+      }
+
+      function moveThirdStoryEntry(from, insertionIndex) {
+        const [entry] = thirdStoryEntries.splice(from, 1);
+        const destination = insertionIndex > from ? insertionIndex - 1 : insertionIndex;
+        thirdStoryEntries.splice(destination, 0, entry);
+        renderThirdStory(destination);
+      }
+
       function resetPassage() {
         passageWords = originalPassageWords.map((text) => ({ text, removed: false }));
         passageModal.hidden = true;
@@ -822,6 +1069,12 @@
       function switchLevel(level) {
         if (level === activeLevel) return;
         const isFirstLevel = level === 1;
+        const isSecondLevel = level === 2;
+        if (activeLevel === 1 && !isFirstLevel) {
+          clearInterval(spawnTimer);
+          clearInterval(frameTimer);
+          firstLevelPausedAt = firstLevelStarted ? performance.now() : null;
+        }
         if (isFirstLevel) {
           if (firstLevelStarted && firstLevelPausedAt !== null) {
             const pausedFor = performance.now() - firstLevelPausedAt;
@@ -829,6 +1082,7 @@
           }
           firstLevelView.hidden = false;
           secondLevelView.hidden = true;
+          thirdLevelView.hidden = true;
           pageEyebrow.textContent = "Три уровня · уровень первый";
           pageSubtitle.textContent = "Лови слова и фразы, затем дополни рассказ своими словами до 33.";
           if (firstLevelStarted) {
@@ -836,25 +1090,36 @@
             startFirstLevelTimers();
           }
           firstLevelPausedAt = null;
-        } else {
-          clearInterval(spawnTimer);
-          clearInterval(frameTimer);
-          firstLevelPausedAt = firstLevelStarted ? performance.now() : null;
+        } else if (isSecondLevel) {
           firstLevelView.hidden = true;
           secondLevelView.hidden = false;
+          thirdLevelView.hidden = true;
           pageEyebrow.textContent = "Три уровня · уровень второй";
           pageSubtitle.textContent = "Допиши предысторию и сократи рассказ до 33 слов.";
           renderPassage();
+        } else {
+          firstLevelView.hidden = true;
+          secondLevelView.hidden = true;
+          thirdLevelView.hidden = false;
+          pageEyebrow.textContent = "Три уровня · уровень третий";
+          pageSubtitle.textContent = "Найди несоответствия на картине и собери рассказ из найденных слов.";
         }
         activeLevel = level;
         firstLevelButton.classList.toggle("active", isFirstLevel);
-        secondLevelButton.classList.toggle("active", !isFirstLevel);
+        secondLevelButton.classList.toggle("active", isSecondLevel);
+        thirdLevelButton.classList.toggle("active", !isFirstLevel && !isSecondLevel);
         if (isFirstLevel) {
           firstLevelButton.setAttribute("aria-current", "step");
           secondLevelButton.removeAttribute("aria-current");
-        } else {
+          thirdLevelButton.removeAttribute("aria-current");
+        } else if (isSecondLevel) {
           secondLevelButton.setAttribute("aria-current", "step");
           firstLevelButton.removeAttribute("aria-current");
+          thirdLevelButton.removeAttribute("aria-current");
+        } else {
+          thirdLevelButton.setAttribute("aria-current", "step");
+          firstLevelButton.removeAttribute("aria-current");
+          secondLevelButton.removeAttribute("aria-current");
         }
       }
 
@@ -1250,6 +1515,122 @@
         storyWords.querySelectorAll(".is-dragging, .drop-target, .drop-before, .drop-after").forEach((token) => token.classList.remove("is-dragging", "drop-target", "drop-before", "drop-after"));
       });
 
+      anomalyImage.addEventListener("click", (event) => {
+        const button = event.target.closest(".anomaly-hotspot");
+        if (!button || foundAnomalies.has(button.dataset.anomaly)) return;
+        const foundAnomalyId = button.dataset.anomaly;
+        foundAnomalies.add(foundAnomalyId);
+        anomalyProgress.textContent = `Найдено ${foundAnomalies.size} / 10 несоответствий`;
+        renderAnomalyBoard(foundAnomalyId);
+        renderAnomalyWords();
+      });
+
+      anomalyWordGroups.addEventListener("click", (event) => {
+        const button = event.target.closest(".anomaly-word-option");
+        if (!button || button.disabled || !foundAnomalies.size) return;
+        const key = button.dataset.wordKey;
+        if (chosenAnomalyWords.has(key)) {
+          chosenAnomalyWords.delete(key);
+          if (!thirdStoryPanel.hidden) {
+            thirdStoryPanel.hidden = true;
+            thirdStoryEntries = [];
+          }
+        } else {
+          if (chosenAnomalyWords.size >= 10) return;
+          chosenAnomalyWords.add(key);
+        }
+        if (chosenAnomalyWords.size === 10) buildThirdStory();
+        renderAnomalyWords(thirdStoryPanel.hidden ? key : null);
+      });
+
+      document.querySelector("#third-change-words").addEventListener("click", () => {
+        chosenAnomalyWords.clear();
+        thirdStoryEntries = [];
+        thirdStoryPanel.hidden = true;
+        renderAnomalyWords(`${anomalies[0].id}:${anomalies[0].words[0]}`);
+      });
+
+      thirdStoryPaper.addEventListener("input", (event) => {
+        const input = event.target.closest(".third-story-token input");
+        if (!input) return;
+        const token = input.closest(".third-story-token");
+        const entry = thirdStoryEntries[Number(token.dataset.index)];
+        entry.text = input.value;
+        input.size = Math.max(4, input.value.length);
+        input.setAttribute("aria-invalid", String(input.value.trim() !== "" && countWords(input.value) !== 1));
+        updateThirdStoryCount();
+      });
+
+      thirdStoryPaper.addEventListener("keydown", (event) => {
+        const token = event.target.closest(".third-story-token");
+        if (!token || (event.key !== "ArrowLeft" && event.key !== "ArrowRight")) return;
+        const from = Number(token.dataset.index);
+        const input = event.target.closest("input");
+        if (input) {
+          const atBoundary = event.key === "ArrowLeft"
+            ? input.selectionStart === 0 && input.selectionEnd === 0
+            : input.selectionStart === input.value.length && input.selectionEnd === input.value.length;
+          if (!atBoundary) return;
+        }
+        const to = from + (event.key === "ArrowLeft" ? -1 : 1);
+        if (to < 0 || to >= thirdStoryEntries.length) return;
+        const selection = input ? [input.selectionStart, input.selectionEnd] : null;
+        event.preventDefault();
+        [thirdStoryEntries[from], thirdStoryEntries[to]] = [thirdStoryEntries[to], thirdStoryEntries[from]];
+        renderThirdStory(to);
+        if (selection) thirdStoryPaper.querySelector(`[data-index="${to}"] input`)?.setSelectionRange(...selection);
+      });
+
+      thirdStoryPaper.addEventListener("pointerdown", (event) => {
+        const token = event.target.closest(".third-story-token");
+        if (!token || event.button !== 0) return;
+        thirdStoryDrag = {
+          pointerId: event.pointerId,
+          from: Number(token.dataset.index),
+          startX: event.clientX,
+          startY: event.clientY,
+          started: false
+        };
+      });
+
+      document.addEventListener("pointermove", (event) => {
+        if (!thirdStoryDrag || event.pointerId !== thirdStoryDrag.pointerId) return;
+        if (!thirdStoryDrag.started && Math.hypot(event.clientX - thirdStoryDrag.startX, event.clientY - thirdStoryDrag.startY) > 6) {
+          thirdStoryDrag.started = true;
+          thirdStoryPaper.querySelector(`[data-index="${thirdStoryDrag.from}"]`)?.classList.add("is-dragging");
+        }
+        if (!thirdStoryDrag.started) return;
+        event.preventDefault();
+        thirdStoryPaper.querySelectorAll(".drop-target").forEach((token) => token.classList.remove("drop-target"));
+        const placement = thirdStoryPlacement(event.clientX, event.clientY);
+        if (placement.targetIndex !== null) {
+          thirdStoryPaper.querySelector(`[data-index="${placement.targetIndex}"]`)?.classList.add("drop-target");
+        }
+      });
+
+      document.addEventListener("pointerup", (event) => {
+        if (!thirdStoryDrag || event.pointerId !== thirdStoryDrag.pointerId) return;
+        const drag = thirdStoryDrag;
+        thirdStoryDrag = null;
+        if (!drag.started) return;
+        const target = document.elementFromPoint(event.clientX, event.clientY);
+        if (target && thirdStoryPaper.contains(target)) {
+          const placement = thirdStoryPlacement(event.clientX, event.clientY);
+          if (placement.index !== drag.from && placement.index !== drag.from + 1) {
+            moveThirdStoryEntry(drag.from, placement.index);
+          } else {
+            thirdStoryPaper.querySelectorAll(".is-dragging, .drop-target").forEach((token) => token.classList.remove("is-dragging", "drop-target"));
+          }
+        } else {
+          thirdStoryPaper.querySelectorAll(".is-dragging, .drop-target").forEach((token) => token.classList.remove("is-dragging", "drop-target"));
+        }
+      });
+
+      document.addEventListener("pointercancel", () => {
+        thirdStoryDrag = null;
+        thirdStoryPaper.querySelectorAll(".is-dragging, .drop-target").forEach((token) => token.classList.remove("is-dragging", "drop-target"));
+      });
+
       manualWords.addEventListener("input", (event) => {
         const input = event.target.closest(".manual-word");
         if (!input) return;
@@ -1300,10 +1681,12 @@
         }
         if (event.key === "Escape" && !modal.hidden) modal.hidden = true;
         if (event.key === "Escape" && !passageModal.hidden) passageModal.hidden = true;
+        if (event.key === "Escape" && !thirdFinishModal.hidden) thirdFinishModal.hidden = true;
       });
 
       firstLevelButton.addEventListener("click", () => switchLevel(1));
       secondLevelButton.addEventListener("click", () => switchLevel(2));
+      thirdLevelButton.addEventListener("click", () => switchLevel(3));
       startGameButton.addEventListener("click", startGame);
       prehistoryInput.addEventListener("input", updatePrehistoryCount);
       document.querySelector("#restart-button").addEventListener("click", restart);
@@ -1322,6 +1705,16 @@
       document.querySelector("#passage-play-again").addEventListener("click", resetPassage);
       passageModal.addEventListener("click", (event) => {
         if (event.target === passageModal) passageModal.hidden = true;
+      });
+      thirdFinishButton.addEventListener("click", () => {
+        if (thirdFinishButton.disabled) return;
+        thirdFinalStory.textContent = thirdStoryEntries.map((entry) => entry.text.trim()).join(" ");
+        thirdFinishModal.hidden = false;
+        thirdFinishClose.focus();
+      });
+      thirdFinishClose.addEventListener("click", () => { thirdFinishModal.hidden = true; });
+      thirdFinishModal.addEventListener("click", (event) => {
+        if (event.target === thirdFinishModal) thirdFinishModal.hidden = true;
       });
       finishButton.addEventListener("click", () => {
         manualWordInputs().forEach((input) => {
@@ -1348,6 +1741,11 @@
       if (passages.length !== 10 || passages.some((passage) => !passage.text.trim())) {
         throw new Error("The excerpt catalog must contain 10 non-empty texts");
       }
+      if (anomalies.length !== 10 || anomalies.some((anomaly) => anomaly.words.length !== 3)) {
+        throw new Error("The hidden-object game must contain 10 anomalies with 3 words each");
+      }
+      renderAnomalyBoard();
+      renderAnomalyWords();
       populatePassages();
       renderPassage();
       restart();
